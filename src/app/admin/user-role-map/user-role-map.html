@@ -1,0 +1,126 @@
+<div class="card rounded-card">
+    <p-table #dt2 [value]="modelSvc.userRoleMapModelList" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        [loading]="loading" [paginator]="true" [globalFilterFields]="['userName', 'empName', 'roleName']"
+        [tableStyle]="{ 'min-width': '75rem' }">
+        <ng-template #caption>
+            <div class="d-flex align-items-center">
+                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt2)"><i
+                        class="bi bi-x-circle-fill"></i></p-button>
+                <div class="flex-grow-1"></div>
+                <p-iconfield iconPosition="right">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input pInputText type="text" (input)="onGlobalFilter($event)" placeholder="Search keyword" />
+                </p-iconfield>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr>
+                <th style="width:22%">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">User</span>
+
+                        <div class="dropdown">
+                            <button type="button"  class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="bi bi-filter"></i>
+                            </button>
+
+                            <div class="dropdown-menu p-4">                                
+                                <p-multiselect [(ngModel)]="modelSvc.selectedUserNames" [options]="modelSvc.ddlUserNames"
+                                    placeholder="Any" optionLabel="userName" style="min-width: 14rem"
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                </p-multiselect>
+
+                                <p-button label="Apply" icon="pi pi-check" (click)="applyFilters('userName')"
+                                    styleClass="p-button-sm mt-2">
+                                </p-button>
+
+                                <p-button label="Clear" icon="pi pi-times" (click)="clearFilters('userName')"
+                                    styleClass="p-button-sm p-button-text">
+                                </p-button>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+                <th style="width:22%">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">Employee</span>
+
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="bi bi-filter"></i>
+                            </button>
+
+                            <div class="dropdown-menu p-4">
+                                <p-multiselect [(ngModel)]="modelSvc.selectedEmpNames" [options]="modelSvc.ddlEmpNames"
+                                    placeholder="Any" optionLabel="empName" style="min-width: 14rem"
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                </p-multiselect>
+
+                                <p-button label="Apply" icon="pi pi-check" (click)="applyFilters('empName')"
+                                    styleClass="p-button-sm mt-2">
+                                </p-button>
+
+                                <p-button label="Clear" icon="pi pi-times" (click)="clearFilters('empName')"
+                                    styleClass="p-button-sm p-button-text">
+                                </p-button>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+                <th style="width:22%">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">Role</span>
+
+                        <div class="dropdown">
+                            <button type="button" id="roleDropdownBtn" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="bi bi-filter"></i>
+                            </button>
+
+                            <div class="dropdown-menu p-4">                                
+                                <p-multiselect [(ngModel)]="modelSvc.selectedRoleNames" [options]="modelSvc.ddlRoleNames"
+                                    placeholder="Any" optionLabel="roleName" style="min-width: 14rem"
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                </p-multiselect>
+
+                                <p-button label="Apply" icon="pi pi-check" data-bs-auto-close="outside" (click)="applyFilters('roleName')"
+                                    styleClass="p-button-sm mt-2">
+                                </p-button>
+
+                                <p-button label="Clear" icon="pi pi-times" data-bs-auto-close="outside" (click)="clearFilters('roleName')"
+                                    styleClass="p-button-sm p-button-text">
+                                </p-button>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+                <th style="width:22%">Has Access?</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-userRole>
+            <tr>
+                <td>
+                    {{ userRole.userName }}
+                </td>
+                <td>
+                    {{ userRole.empName }}
+                </td>
+                <td>
+                    {{ userRole.roleName }}
+                </td>
+                <td>
+                    {{ userRole.isActive | booleanToYesNo:'Active':'Inactive' }}
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="4">No data found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
