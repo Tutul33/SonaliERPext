@@ -13,26 +13,41 @@ import { InformationService } from '../../shared/services/information-service';
 import { BooleanToYesNoPipe } from '../../shared/pipes/boolean-to-yes-no-pipe';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import * as bootstrap from 'bootstrap';
+import { CheckboxModule } from 'primeng/checkbox';
+import { LoadingService } from '../../shared/services/loading-service';
 @Component({
   selector: 'app-user-role-map',
-  imports: [TableModule, TagModule, IconFieldModule, InputTextModule, InputIconModule, MultiSelectModule, SelectModule, CommonModule, BooleanToYesNoPipe, ButtonModule, FormsModule],
+  imports: [TableModule, TagModule, IconFieldModule, InputTextModule, InputIconModule, MultiSelectModule, SelectModule, CommonModule, CheckboxModule, ButtonModule, FormsModule, BooleanToYesNoPipe],
   templateUrl: './user-role-map.html',
   styleUrl: './user-role-map.css',
 
 })
 export class UserRoleMap {
   @ViewChild('dt2') dt2!: Table;
+  @ViewChild('roleFilterBtn') roleFilterBtn!: any;
+  @ViewChild('userFilterBtn') userFilterBtn!: any;
+  @ViewChild('employeeFilterBtn') employeeFilterBtn!: any;
   loading: boolean = true;
 
   constructor(
     private dataSvc: UserRoleMapDataService,
     public modelSvc: UserRoleMapModelService,
     private msgSvc: InformationService,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit() {
     this.getUserRoleMapList();
+  }
+
+  ngAfterViewInit() { }
+
+  checkAll() {
+    try {
+      this.modelSvc.checkAll();
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
   }
 
   clear(table: Table) {
@@ -74,73 +89,97 @@ export class UserRoleMap {
   }
 
 
-filter(event: any) {
-  try {
-    if (event?.itemValue?.hasOwnProperty('empName')) {
-      this.modelSvc.filterEmpNames = event.value.map(v => v.empName);
+  filter(event: any) {
+    try {
+      if (event?.itemValue?.hasOwnProperty('empName')) {
+        this.modelSvc.filterEmpNames = event.value.map(v => v.empName);
+      }
+      if (event?.itemValue?.hasOwnProperty('userName')) {
+        this.modelSvc.filterUserNames = event.value.map(v => v.userName);
+      }
+      if (event?.itemValue?.hasOwnProperty('roleName')) {
+        this.modelSvc.filterRoleNames = event.value.map(v => v.roleName);
+      }
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
     }
-    if (event?.itemValue?.hasOwnProperty('userName')) {
-      this.modelSvc.filterUserNames = event.value.map(v => v.userName);
-    }
-    if (event?.itemValue?.hasOwnProperty('roleName')) {
-      this.modelSvc.filterRoleNames = event.value.map(v => v.roleName);
-    }
-  } catch (error) {
-    this.msgSvc.showErrorMsg(error);
   }
-}
 
-applyFilters(field: string) {
-  try {
-    switch (field) {
-      case 'roleName':
-        this.dt2.filter(this.modelSvc.filterRoleNames, field, 'in');
-        this.closeDropdown('roleDropdownBtn');
-        break;
-      case 'empName':
-        this.dt2.filter(this.modelSvc.filterEmpNames, field, 'in');
-        break;
-      case 'userName':
-        this.dt2.filter(this.modelSvc.filterUserNames, field, 'in');
-        break;
+  applyFilters(field?: string) {
+    try {
+      switch (field) {
+        case 'roleName':
+          this.dt2.filter(this.modelSvc.filterRoleNames, field, 'in');
+          this.closeDropdown(this.roleFilterBtn);
+          break;
+        case 'empName':
+          this.dt2.filter(this.modelSvc.filterEmpNames, field, 'in');
+          this.closeDropdown(this.employeeFilterBtn);
+          break;
+        case 'userName':
+          this.dt2.filter(this.modelSvc.filterUserNames, field, 'in');
+          this.closeDropdown(this.userFilterBtn);
+          break;
+      }
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
     }
-  } catch (error) {
-    this.msgSvc.showErrorMsg(error);
   }
-}
 
-clearFilters(field: string) {
-  try {
-    switch (field) {
-      case 'roleName':
-        this.dt2.filter([], field, 'in');
-        this.modelSvc.filterRoleNames = [];
-        this.modelSvc.selectedRoleNames=[];
-        this.closeDropdown('roleDropdownBtn');
-        break;
-      case 'empName':
-        this.dt2.filter([], field, 'in');
-        this.modelSvc.filterEmpNames = [];
-        this.modelSvc.selectedEmpNames=[];
-        break;
-      case 'userName':
-        this.dt2.filter([], field, 'in');
-        this.modelSvc.filterUserNames = [];
-        this.modelSvc.selectedUserNames=[];
-        break;
+  clearFilters(field?: string) {
+    try {
+      switch (field) {
+        case 'roleName':
+          this.dt2.filter([], field, 'in');
+          this.modelSvc.filterRoleNames = [];
+          this.modelSvc.selectedRoleNames = [];
+          this.closeDropdown(this.roleFilterBtn);
+          break;
+        case 'empName':
+          this.dt2.filter([], field, 'in');
+          this.modelSvc.filterEmpNames = [];
+          this.modelSvc.selectedEmpNames = [];
+          this.closeDropdown(this.employeeFilterBtn);
+          break;
+        case 'userName':
+          this.dt2.filter([], field, 'in');
+          this.modelSvc.filterUserNames = [];
+          this.modelSvc.selectedUserNames = [];
+          this.closeDropdown(this.userFilterBtn);
+          break;
+      }
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
     }
-  } catch (error) {
-    this.msgSvc.showErrorMsg(error);
   }
-}
 
-private closeDropdown(buttonId: string) {
-  const dropdownToggleEl = document.getElementById(buttonId);
-  if (dropdownToggleEl) {
-    const dropdown = bootstrap.Dropdown.getInstance(dropdownToggleEl) 
-                  || new bootstrap.Dropdown(dropdownToggleEl);
-    dropdown.hide();
+  closeDropdown(closeBtn) {
+    try {
+      closeBtn.nativeElement.click();
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
   }
-}
+
+  save() {
+    try {
+      this.loadingService.show();
+      const data = this.modelSvc.prepareDataBeforeSave();
+      this.dataSvc.UpdateUserRoleMap(data).subscribe({
+        next: (res: any) => {
+          this.loadingService.hide();
+          this.msgSvc.showSuccessMsg("Saved Successfully.");
+        },
+        error: (err: any) => {
+          this.loading = false;
+          this.loadingService.hide();
+          this.msgSvc.showErrorMsg(err);
+        }
+      });
+    } catch (error) {
+      this.loadingService.hide();
+      this.msgSvc.showErrorMsg(error);
+    }
+  }
 
 }

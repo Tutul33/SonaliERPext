@@ -6,6 +6,7 @@ import { GlobalMethods } from '../../shared/models/javascriptMethods';
   providedIn: 'root'
 })
 export class UserRoleMapModelService {
+  isCheckAll: boolean = false;
   userRoleMapModelList:UserRoleMap[]=[];
   selectedUserNames:any[]=[];
   ddlUserNames:any[]=[];
@@ -28,4 +29,40 @@ export class UserRoleMapModelService {
       throw error;
     }
   }
+
+  checkAll(){
+    try {
+
+      if (this.isCheckAll) {
+        this.userRoleMapModelList.forEach((item)=>{
+        item.isActive=true;
+      });
+      } else {
+        this.userRoleMapModelList.forEach((item)=>{
+        item.isActive=false;
+      });
+      }  
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  prepareDataBeforeSave(){
+    try {
+      
+      this.userRoleMapModelList.forEach((item)=>{
+        if(item.userRoleMapId){
+          item.setModifyTag();
+        }else{
+          item.setInsertTag();
+        }
+      })
+      return this.userRoleMapModelList;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }

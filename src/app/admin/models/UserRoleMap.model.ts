@@ -5,6 +5,7 @@ export class UserRoleMap {
     isActive: boolean = false;
 
     //Extra
+    userRoleMapId:number=0;
     userName:string="";
     empId:number=0;
     empName:string="";
