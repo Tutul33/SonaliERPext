@@ -25,6 +25,22 @@ export class UserRoleMapModelService {
       this.ddlEmpNames=GlobalMethods.getDistinctBy(this.userRoleMapModelList,'empName');
       this.ddlRoleNames=GlobalMethods.getDistinctBy(this.userRoleMapModelList,'roleName');
       this.ddlUserNames=GlobalMethods.getDistinctBy(this.userRoleMapModelList,'userName');
+      setTimeout(() => {
+        this.setCheckAll();
+      }, 0);
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  setCheckAll(){
+    try {
+      const totalActiveList=this.userRoleMapModelList.filter(x=>x.isActive==true);
+      if(this.userRoleMapModelList.length==totalActiveList.length){
+         this.isCheckAll=true;
+      }else{
+         this.isCheckAll=false;
+      }
     } catch (error) {
       throw error;
     }
@@ -32,7 +48,6 @@ export class UserRoleMapModelService {
 
   checkAll(){
     try {
-
       if (this.isCheckAll) {
         this.userRoleMapModelList.forEach((item)=>{
         item.isActive=true;
@@ -41,8 +56,7 @@ export class UserRoleMapModelService {
         this.userRoleMapModelList.forEach((item)=>{
         item.isActive=false;
       });
-      }  
-      
+      }        
     } catch (error) {
       throw error;
     }

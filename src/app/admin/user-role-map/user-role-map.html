@@ -117,7 +117,7 @@
                 </td>
                 <td>                    
                     <div class="flex items-center gap-2">
-                        <p-checkbox [(ngModel)]="userRole.isActive" inputId="isActive_{{i+1}}" [binary]="true" name="size"  />
+                        <p-checkbox [(ngModel)]="userRole.isActive" inputId="isActive_{{i+1}}" [binary]="true" name="size" (onChange)="modelSvc.setCheckAll()" />
                         <label for="isActive_{{i+1}}" class="ms-1" >{{userRole.isActive| booleanToYesNo}}</label>
                     </div>
                 </td>
@@ -131,8 +131,8 @@
     </p-table>
     <div class="row">
         <div class="col-md-12">
-            <div class="d-flex align-items-center">
-                <p-button label="Save" type="submit" class="ms-3 float-end" (click)="save()"><i class="bi bi-save"></i></p-button>
+            <div class="float-end">
+                <p-button label="Save" type="submit" class="ms-3 " (click)="save()"><i class="bi bi-save"></i></p-button>
                               
             </div>
         </div>

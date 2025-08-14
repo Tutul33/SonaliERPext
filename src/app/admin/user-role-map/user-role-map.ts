@@ -164,18 +164,20 @@ export class UserRoleMap {
   save() {
     try {
       this.loadingService.show();
-      const data = this.modelSvc.prepareDataBeforeSave();
-      this.dataSvc.UpdateUserRoleMap(data).subscribe({
-        next: (res: any) => {
-          this.loadingService.hide();
-          this.msgSvc.showSuccessMsg("Saved Successfully.");
-        },
-        error: (err: any) => {
-          this.loading = false;
-          this.loadingService.hide();
-          this.msgSvc.showErrorMsg(err);
-        }
-      });
+      setTimeout(() => {
+        const data = this.modelSvc.prepareDataBeforeSave();
+        this.dataSvc.UpdateUserRoleMap(data).subscribe({
+          next: (res: any) => {
+            this.loadingService.hide();
+            this.msgSvc.showSuccessMsg("Saved Successfully.");
+          },
+          error: (err: any) => {
+            this.loading = false;
+            this.loadingService.hide();
+            this.msgSvc.showErrorMsg(err);
+          }
+        });
+      }, 10);
     } catch (error) {
       this.loadingService.hide();
       this.msgSvc.showErrorMsg(error);
