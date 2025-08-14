@@ -346,4 +346,37 @@ export class VoucherModelService {
       throw error;
     }
   }
+
+prepareSortData(sortObj, list) {
+  if (!sortObj?.sortField) return [...list];
+
+  return [...list].sort((a, b) => {
+    let valueA = a[sortObj.sortField];
+    let valueB = b[sortObj.sortField];
+
+    if (valueA == null) return 1;
+    if (valueB == null) return -1;
+
+    const isDateA = valueA instanceof Date || !isNaN(Date.parse(valueA));
+    const isDateB = valueB instanceof Date || !isNaN(Date.parse(valueB));
+
+    if (isDateA && isDateB) {
+      valueA = new Date(valueA).getTime();
+      valueB = new Date(valueB).getTime();
+    }
+
+    if (typeof valueA === "number" && typeof valueB === "number") {
+      return sortObj.sortOrder === 1 ? valueA - valueB : valueB - valueA;
+    }
+
+    valueA = valueA.toString().toLowerCase();
+    valueB = valueB.toString().toLowerCase();
+
+    if (valueA < valueB) return sortObj.sortOrder === 1 ? -1 : 1;
+    if (valueA > valueB) return sortObj.sortOrder === 1 ? 1 : -1;
+    return 0;
+  });
+}
+
+
 }

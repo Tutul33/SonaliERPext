@@ -59,9 +59,11 @@ export class VoucherApproval {
   toDate: any;
   voucherType: any;
   visibleModal: boolean = false;
-  @ViewChild('voucherFilterBtn') voucherFilterBtn!:any;
-  @ViewChild('userFilterBtn') userFilterBtn!:any;
-  //Form
+  financeBankingUser: any;
+  @ViewChild('voucherFilterBtn') voucherFilterBtn!: any;
+  @ViewChild('userFilterBtn') userFilterBtn!: any;
+  sortByEntryDate:string='ASC';
+  sortOrder:number=1;
   referralForm!: FormGroup;
 
   //
@@ -153,7 +155,6 @@ export class VoucherApproval {
       this.loading = true;
       this.pageNumber = event.first / event.rows + 1;
       this.pageSize = event.rows;
-
       this.loadVoucherApprovalList();
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
@@ -175,6 +176,22 @@ export class VoucherApproval {
     }
   }
 
+  resetFilter() {
+    try {
+      this.pageNumber = 1;
+      this.pageSize = 50;
+      this.userIds = '';
+      this.voucherNos = '';
+      this.selectedUsers = [];
+      this.selectedVoucherNos = [];
+      this.isShowDetailVoucher = false;
+      this.financeBankingUser="";
+      this.searchDebounce$.next();
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
+  }
+
   loadVoucherApprovalList() {
     if (!this.fromDate && !this.toDate) {
       this.msgSvc.showWarningMsg("Please select FromDate and ToDate.");
@@ -183,6 +200,17 @@ export class VoucherApproval {
     if (this.fromDate > this.toDate) {
       this.msgSvc.showWarningMsg("FromDate can not be greater than ToDate.");
       return;
+    }
+    if (this.financeBankingUser != undefined) {
+      if (this.financeBankingUser.length > 0) {
+        if (this.userIds.length) {
+          if (!this.userIds.includes(this.financeBankingUser)) {
+            this.userIds = ',' + this.financeBankingUser;
+          }
+        } else {
+          this.userIds = this.financeBankingUser;
+        }
+      }
     }
     this.loading = true;
     this.dataSvc.getVoucherApprovalList(this.search, this.fromDate, this.toDate, this.voucherType, this.userIds || '', this.voucherNos || '', this.modelSvc.status, this.pageNumber, this.pageSize).subscribe({
@@ -200,6 +228,15 @@ export class VoucherApproval {
         console.error('Data load failed', err);
       }
     });
+  }
+  
+  sortData(){
+    try {
+      this.sortOrder=this.sortOrder==1?-1:1;
+     this.listVoucher=this.modelSvc.prepareSortData({sortField:'entryDate',sortOrder:this.sortOrder},this.listVoucher)
+    } catch (error) {
+      console.error('Data load failed', error);
+    }
   }
 
   getDistinctList() {
@@ -265,18 +302,18 @@ export class VoucherApproval {
       this.msgSvc.showErrorMsg(error);
     }
   }
-  
-  clearFilters(field){
+
+  clearFilters(field) {
     try {
       switch (field) {
         case 'voucherNo':
-          this.selectedVoucherNos=[];
-          this.voucherNos='';
-          GlobalMethods.closeDropdown(this.voucherFilterBtn);          
+          this.selectedVoucherNos = [];
+          this.voucherNos = '';
+          GlobalMethods.closeDropdown(this.voucherFilterBtn);
           break;
         case 'userId':
-          this.selectedUsers=[];
-          this.userIds='';
+          this.selectedUsers = [];
+          this.userIds = '';
           GlobalMethods.closeDropdown(this.userFilterBtn);
           break;
       }
@@ -287,9 +324,9 @@ export class VoucherApproval {
     }
   }
 
-  closeFilterDropDown(field){
+  closeFilterDropDown(field) {
     try {
-       switch (field) {
+      switch (field) {
         case 'voucherNo':
           GlobalMethods.closeDropdown(this.voucherFilterBtn);
           break;

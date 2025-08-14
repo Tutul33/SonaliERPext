@@ -1,11 +1,13 @@
 <div class="card">
   <div class="row m-1">
-    <div class="col-md-3">
+    <div class="col-md-2">
       <h3>Voucher Authentication</h3><br>
       <h4>
         <span>Role:</span>
-        <span
-          class="text-danger">{{modelSvc.status=='referral-pending'?'Referral':modelSvc.status=='check-pending'?'Voucher Check':'Approval'}}</span>
+        <span class="text-danger">{{modelSvc.status=='referral-pending'?'Referral':modelSvc.status=='check-pending'?'Voucher Check':'Approval'}}</span>
+      </h4>
+      <h4>
+        <span>Total:</span><span class="text-danger">{{totalRecords}}</span>
       </h4>
     </div>
     <div class="col-md-2">
@@ -16,7 +18,7 @@
       <span>To Date</span><br>
       <p-datepicker [(ngModel)]="toDate" placeholder="Date" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <span>Type</span><br>
       <p-select [filter]="true" [(ngModel)]="voucherType" [options]="modelSvc.voucherTypes" placeholder="Any"
         optionLabel="name" optionValue="name" style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }">
@@ -26,10 +28,29 @@
           </div>
         </ng-template>
       </p-select>
-
+    </div>
+    <div class="col-md-2">
+      <span>User</span><br>
+      <p-select [options]="modelSvc.listFinanceBankingUser" appendTo="body" [(ngModel)]="financeBankingUser"
+        optionLabel="empName" optionValue="userName" [filter]="true" filterBy="empName" [showClear]="true"
+        placeholder="Select a User" class="w-full md:w-56" [style]="{ width: '100%' }">
+        <ng-template #selectedItem let-selectedOption>
+          <div class="flex items-center gap-2">
+            <div>{{ selectedOption.empName }}</div>
+          </div>
+        </ng-template>
+        <ng-template let-item #item>
+          <div class="flex items-center gap-2">
+            <div>{{ item.empName }}</div>
+          </div>
+        </ng-template>
+      </p-select>
     </div>
     <div class="col-md-2">
       <p-button label="Search" icon="pi pi-check" (onClick)="searchFilter()" styleClass="p-button-sm mt-4"><i
+          class="bi bi-search"></i>
+      </p-button>
+      <p-button label="Reset" icon="pi pi-check" severity="danger" (onClick)="resetFilter()" styleClass="p-button-sm ms-1 mt-4"><i
           class="bi bi-search"></i>
       </p-button>
     </div>
@@ -57,7 +78,12 @@
     <ng-template #header>
       <tr>
         <th style="width: 22%">View</th>
-        <th style="width: 22%">Date</th>
+        <th style="width: 22%" >
+          <div class="flex items-center gap-2">
+              Date
+              <a href="javascript:void(0)" (click)="sortData()"><i [ngClass]="{'bi':true,'bi bi-sort-down-alt':sortOrder==-1,'bi bi-sort-up-alt':sortOrder== 1}" ></i></a>
+          </div>
+        </th>
         <th style="width: 22%">
           <div class="d-flex align-items-center gap-2">
             <span class="fw-bold">Voucher</span>
