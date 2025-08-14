@@ -15,6 +15,7 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { LoadingService } from '../../shared/services/loading-service';
+import { GlobalMethods } from '../../shared/models/javascriptMethods';
 @Component({
   selector: 'app-user-role-map',
   imports: [TableModule, TagModule, IconFieldModule, InputTextModule, InputIconModule, MultiSelectModule, SelectModule, CommonModule, CheckboxModule, ButtonModule, FormsModule, BooleanToYesNoPipe],
@@ -110,15 +111,15 @@ export class UserRoleMap {
       switch (field) {
         case 'roleName':
           this.dt2.filter(this.modelSvc.filterRoleNames, field, 'in');
-          this.closeDropdown(this.roleFilterBtn);
+          GlobalMethods.closeDropdown(this.roleFilterBtn);
           break;
         case 'empName':
           this.dt2.filter(this.modelSvc.filterEmpNames, field, 'in');
-          this.closeDropdown(this.employeeFilterBtn);
+          GlobalMethods.closeDropdown(this.employeeFilterBtn);
           break;
         case 'userName':
           this.dt2.filter(this.modelSvc.filterUserNames, field, 'in');
-          this.closeDropdown(this.userFilterBtn);
+          GlobalMethods.closeDropdown(this.userFilterBtn);
           break;
       }
     } catch (error) {
@@ -133,19 +134,19 @@ export class UserRoleMap {
           this.dt2.filter([], field, 'in');
           this.modelSvc.filterRoleNames = [];
           this.modelSvc.selectedRoleNames = [];
-          this.closeDropdown(this.roleFilterBtn);
+          GlobalMethods.closeDropdown(this.roleFilterBtn);
           break;
         case 'empName':
           this.dt2.filter([], field, 'in');
           this.modelSvc.filterEmpNames = [];
           this.modelSvc.selectedEmpNames = [];
-          this.closeDropdown(this.employeeFilterBtn);
+          GlobalMethods.closeDropdown(this.employeeFilterBtn);
           break;
         case 'userName':
           this.dt2.filter([], field, 'in');
           this.modelSvc.filterUserNames = [];
           this.modelSvc.selectedUserNames = [];
-          this.closeDropdown(this.userFilterBtn);
+          GlobalMethods.closeDropdown(this.userFilterBtn);
           break;
       }
     } catch (error) {

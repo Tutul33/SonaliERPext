@@ -46,6 +46,13 @@ export class GlobalMethods {
     return error as any;
   }
 }
+static closeDropdown(closeBtn) {
+    try {
+      closeBtn.nativeElement.click();
+    } catch (error) {
+      return error as any;
+    }
+  }
 }
 export const EntityState = {
   /**

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, viewChild, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { VoucherDataService } from '../services/voucher/voucher.data.service';
 import { CommonModule } from '@angular/common';
@@ -23,6 +23,7 @@ import { ConfirmationDialogService } from '../../shared/services/confirm-dialog.
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { Referral } from '../models/Referral.model';
 import { TextareaModule } from 'primeng/textarea';
+import { GlobalMethods } from '../../shared/models/javascriptMethods';
 
 
 @Component({
@@ -58,7 +59,8 @@ export class VoucherApproval {
   toDate: any;
   voucherType: any;
   visibleModal: boolean = false;
-
+  @ViewChild('voucherFilterBtn') voucherFilterBtn!:any;
+  @ViewChild('userFilterBtn') userFilterBtn!:any;
   //Form
   referralForm!: FormGroup;
 
@@ -254,10 +256,47 @@ export class VoucherApproval {
     }
   }
 
-  applyFilters() {
+  applyFilters(field) {
     try {
+      this.closeFilterDropDown(field);
       this.pageNumber = 1;
       this.onLazyLoad({ first: 0, rows: this.pageSize });
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
+  }
+  
+  clearFilters(field){
+    try {
+      switch (field) {
+        case 'voucherNo':
+          this.selectedVoucherNos=[];
+          this.voucherNos='';
+          GlobalMethods.closeDropdown(this.voucherFilterBtn);          
+          break;
+        case 'userId':
+          this.selectedUsers=[];
+          this.userIds='';
+          GlobalMethods.closeDropdown(this.userFilterBtn);
+          break;
+      }
+      this.pageNumber = 1;
+      this.onLazyLoad({ first: 0, rows: this.pageSize });
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
+  }
+
+  closeFilterDropDown(field){
+    try {
+       switch (field) {
+        case 'voucherNo':
+          GlobalMethods.closeDropdown(this.voucherFilterBtn);
+          break;
+        case 'userId':
+          GlobalMethods.closeDropdown(this.userFilterBtn);
+          break;
+      }
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
     }
