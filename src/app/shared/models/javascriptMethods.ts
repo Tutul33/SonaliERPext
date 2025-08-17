@@ -3,7 +3,7 @@ import { TreeNode } from 'primeng/api';
 
 export class GlobalMethods {
   static ApiUrl(){
-    return 'http://localhost:5020/api/';
+    return 'http://localhost:8081/api/';
   }
 
   static deepClone<T>(value: T): T {

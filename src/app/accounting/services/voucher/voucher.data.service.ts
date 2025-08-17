@@ -2,10 +2,11 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { GlobalMethods } from '../../../shared/models/javascriptMethods';
 
 @Injectable()
 export class VoucherDataService {
-   url: string = 'http://localhost:5020/api/voucher/';
+   url: string = GlobalMethods.ApiUrl()+'voucher/';
    constructor(private http: HttpClient) {
 
    }

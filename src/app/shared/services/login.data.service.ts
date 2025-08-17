@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { GlobalMethods } from '../models/javascriptMethods';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginDataService {
-   url:string='http://localhost:5020/api/login/';
+   url:string= GlobalMethods.ApiUrl()+'login/';
    constructor(private http: HttpClient) {
 
     }
