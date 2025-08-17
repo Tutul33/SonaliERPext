@@ -4,8 +4,8 @@
         [tableStyle]="{ 'min-width': '75rem','border': '1px solid #e5e5e5' }">
         <ng-template #caption>
             <div class="d-flex align-items-center">
-                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt2)"><i
-                        class="bi bi-x-circle-fill"></i></p-button>
+                <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" styleClass="p-button-sm" (click)="clear(dt2)">
+                    <i class="bi bi-x-circle-fill"></i></p-button>
                 <div class="flex-grow-1"></div>
                 <p-iconfield iconPosition="right">
                     <p-inputicon>
@@ -17,7 +17,7 @@
         </ng-template>
         <ng-template #header>
             <tr>
-                <th style="width:22%">
+                <th style="width:22%">                    
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-bold">User</span>
 
@@ -25,20 +25,22 @@
                             <a href="javascript:viod(0)" #userFilterBtn class="dropdown-toggle"
                                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"><i
                                     class="bi bi-funnel"></i></a>
-
                             <div class="dropdown-menu p-4">
-                                <p-multiselect [(ngModel)]="modelSvc.selectedUserNames"
-                                    [options]="modelSvc.ddlUserNames" placeholder="Any" optionLabel="userName"
-                                    style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }"
-                                    (onChange)="filter($event)" appendTo="body">
+                                <p-multiselect [(ngModel)]="modelSvc.selectedUserNames" [options]="modelSvc.ddlUserNames"
+                                    placeholder="Any" optionLabel="userName" style="min-width: 14rem"
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                    <ng-template let-option #item>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>{{ option.userName }}</span>
+                                        </div>
+                                    </ng-template>
                                 </p-multiselect>
 
                                 <p-button label="Apply" icon="pi pi-check" (click)="applyFilters('userName')"
                                     styleClass="p-button-sm mt-2">
                                 </p-button>
-
-                                <p-button label="Clear" icon="pi pi-times" (click)="clearFilters('userName')"
-                                    styleClass="p-button-sm p-button-text">
+                                <p-button label="Clear" severity="danger" icon="pi pi-times" class="ms-1"
+                                    (click)="clearFilters('userName')" styleClass="p-button-sm">
                                 </p-button>
                             </div>
                         </div>
@@ -52,19 +54,22 @@
                             <a href="javascript:viod(0)" #employeeFilterBtn class="dropdown-toggle"
                                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"><i
                                     class="bi bi-funnel"></i></a>
-
                             <div class="dropdown-menu p-4">
                                 <p-multiselect [(ngModel)]="modelSvc.selectedEmpNames" [options]="modelSvc.ddlEmpNames"
                                     placeholder="Any" optionLabel="empName" style="min-width: 14rem"
-                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)" appendTo="body">
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                    <ng-template let-option #item>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>{{ option.empName }}</span>
+                                        </div>
+                                    </ng-template>
                                 </p-multiselect>
 
                                 <p-button label="Apply" icon="pi pi-check" (click)="applyFilters('empName')"
                                     styleClass="p-button-sm mt-2">
                                 </p-button>
-
-                                <p-button label="Clear" icon="pi pi-times" (click)="clearFilters('empName')"
-                                    styleClass="p-button-sm p-button-text">
+                                <p-button label="Clear" severity="danger" icon="pi pi-times" class="ms-1"
+                                    (click)="clearFilters('empName')" styleClass="p-button-sm">
                                 </p-button>
                             </div>
                         </div>
@@ -79,18 +84,21 @@
                                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"><i
                                     class="bi bi-funnel"></i></a>
                             <div class="dropdown-menu p-4">
-                                <p-multiselect [(ngModel)]="modelSvc.selectedRoleNames"
-                                    [options]="modelSvc.ddlRoleNames" placeholder="Any" optionLabel="roleName"
-                                    style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }"
-                                    (onChange)="filter($event)" appendTo="body">
+                                <p-multiselect [(ngModel)]="modelSvc.selectedRoleNames" [options]="modelSvc.ddlRoleNames"
+                                    placeholder="Any" optionLabel="roleName" style="min-width: 14rem"
+                                    [panelStyle]="{ minWidth: '16rem' }" (onChange)="filter($event)">
+                                    <ng-template let-option #item>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>{{ option.roleName }}</span>
+                                        </div>
+                                    </ng-template>
                                 </p-multiselect>
 
-                                <p-button label="Apply" icon="pi pi-check" data-bs-auto-close="outside"
-                                    (click)="applyFilters('roleName')" styleClass="p-button-sm mt-2">
+                                <p-button label="Apply" icon="pi pi-check" (click)="applyFilters('roleName')"
+                                    styleClass="p-button-sm mt-2">
                                 </p-button>
-
-                                <p-button label="Clear" icon="pi pi-times" data-bs-auto-close="outside"
-                                    (click)="clearFilters('roleName')" styleClass="p-button-sm p-button-text">
+                                <p-button label="Clear" severity="danger" icon="pi pi-times" class="ms-1"
+                                    (click)="clearFilters('roleName')" styleClass="p-button-sm">
                                 </p-button>
                             </div>
                         </div>
@@ -98,8 +106,9 @@
                 </th>
                 <th style="width:22%">
                     <div class="flex items-center gap-2">
-                        <p-checkbox  inputId="isActive_All" [(ngModel)]="modelSvc.isCheckAll" [binary]="true" name="size" (onChange)="checkAll()"  />
-                        <label for="isActive_All" class="ms-1" >Has Access?</label>
+                        <p-checkbox inputId="isActive_All" [(ngModel)]="modelSvc.isCheckAll" [binary]="true" name="size"
+                            (onChange)="checkAll()" />
+                        <label for="isActive_All" class="ms-1">Has Access?</label>
                     </div>
                 </th>
             </tr>
@@ -115,10 +124,11 @@
                 <td>
                     {{ userRole.roleName }}
                 </td>
-                <td>                    
+                <td>
                     <div class="flex items-center gap-2">
-                        <p-checkbox [(ngModel)]="userRole.isActive" inputId="isActive_{{i+1}}" [binary]="true" name="size" (onChange)="modelSvc.setCheckAll()" />
-                        <label for="isActive_{{i+1}}" class="ms-1" >{{userRole.isActive| booleanToYesNo}}</label>
+                        <p-checkbox [(ngModel)]="userRole.isActive" inputId="isActive_{{i+1}}" [binary]="true"
+                            name="size" (onChange)="modelSvc.setCheckAll()" />
+                        <label for="isActive_{{i+1}}" class="ms-1">{{userRole.isActive| booleanToYesNo}}</label>
                     </div>
                 </td>
             </tr>
@@ -132,8 +142,9 @@
     <div class="row">
         <div class="col-md-12">
             <div class="float-end">
-                <p-button label="Save" type="submit" class="ms-3 " (click)="save()"><i class="bi bi-save"></i></p-button>
-                              
+                <p-button label="Save" type="submit" styleClass="ms-3 p-button-sm"  (click)="save()"><i
+                        class="bi bi-save"></i></p-button>
+
             </div>
         </div>
     </div>

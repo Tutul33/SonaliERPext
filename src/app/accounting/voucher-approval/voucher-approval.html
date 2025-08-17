@@ -47,11 +47,11 @@
       </p-select>
     </div>
     <div class="col-md-2">
-      <p-button label="Search" icon="pi pi-check" (onClick)="searchFilter()" styleClass="p-button-sm mt-4"><i
-          class="bi bi-search"></i>
+      <p-button label="Search" icon="pi pi-check" (onClick)="searchFilter()" styleClass="p-button-sm mt-4">
+        <i class="bi bi-search"></i>
       </p-button>
-      <p-button label="Reset" icon="pi pi-check" severity="danger" (onClick)="resetFilter()" styleClass="p-button-sm ms-1 mt-4"><i
-          class="bi bi-search"></i>
+      <p-button label="Reset" icon="pi pi-check" severity="danger" (onClick)="resetFilter()" styleClass="p-button-sm ms-1 mt-4">
+        <i class="bi bi-arrow-counterclockwise"></i>
       </p-button>
     </div>
   </div>
@@ -64,7 +64,7 @@
     [globalFilterFields]="['voucherNo', 'user.name']" [tableStyle]="{ 'min-width': '75rem','min-height': '500px' ,'border': '1px solid #e5e5e5'}">
     <ng-template #caption>
       <div class="d-flex align-items-center">
-        <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt2)"><i
+        <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" styleClass="p-button-sm" (click)="clear(dt2)"><i
             class="bi bi-x-circle-fill"></i></p-button>
         <div class="flex-grow-1"></div>
         <p-iconfield iconPosition="right">
@@ -200,7 +200,7 @@
   </div>
   <div class="row m-3">
     <div class="col-md-12 mb-3">
-      <p-button label="Add" (onClick)="addNewVoucherItem()" class="float-end"><i class="bi bi-plus"></i></p-button>
+      <p-button label="Add" (onClick)="addNewVoucherItem()" styleClass="float-end p-button-sm"><i class="bi bi-plus"></i></p-button>
     </div>
     <p-table class="rounded-table" [value]="modelSvc.voucherModel.voucherItems" [sortOrder]="-1">
       <ng-template #header>
@@ -272,7 +272,7 @@
           <td><textarea rows="2" cols="30" pTextarea [(ngModel)]="voucherItem.descrp"></textarea></td>
           <td>
             @if(voucherItem.tag != 3){
-            <p-button label="" severity="danger" (onClick)="removeVoucherItem(voucherItem)"><i
+            <p-button label="" severity="danger" styleClass="p-button-sm" (onClick)="removeVoucherItem(voucherItem)"><i
                 class="bi bi-trash"></i></p-button>
             }
           </td>
@@ -311,18 +311,18 @@
 
       <p-button
         [label]="modelSvc.status=='referral-pending'?'Update':modelSvc.status=='check-pending'?'Check':'Approve'"
-        severity="success" class="" (onClick)="confirmUpdateVoucher($event)">
+        severity="success" styleClass="p-button-sm" (onClick)="confirmUpdateVoucher($event)">
         <i
           [ngClass]="{'bi bi-check-circle': modelSvc.status !== 'check-pending','bi bi-check': modelSvc.status === 'check-pending' }"></i>
       </p-button>
 
-      <p-button label="Cancel" severity="warn" class="ms-3" (onClick)="showDetailsToggle(null)"><i
+      <p-button label="Cancel" severity="warn" styleClass="ms-3 p-button-sm" (onClick)="showDetailsToggle(null)"><i
           class="bi bi-x-circle"></i></p-button>
       @if(modelSvc.status !== 'referral-pending'){
-      <p-button label="Refer" severity="help" class="ms-3" (onClick)="showDialogReferral()"><i
+      <p-button label="Refer" severity="help" styleClass="ms-3 p-button-sm" (onClick)="showDialogReferral()"><i
           class="bi bi-box-arrow-up-right"></i></p-button>
       }
-      <p-button label="Reset" severity="danger" class="ms-3" (onClick)="resetVoucherEdit()"><i
+      <p-button label="Reset" severity="danger" styleClass="ms-3 p-button-sm" (onClick)="resetVoucherEdit()"><i
           class="bi bi-arrow-counterclockwise"></i></p-button>
     </div>
   </div>
@@ -364,8 +364,8 @@
       }
     </div>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" (click)="visibleModal = false" />
-      <p-button label="Save" [disabled]="referralForm.invalid" type="submit" class="ms-3"><i
+      <p-button label="Cancel" severity="secondary" class="p-button-sm" (click)="visibleModal = false" />
+      <p-button label="Save" [disabled]="referralForm.invalid" type="submit" class="p-button-sm ms-3"><i
           class="bi bi-save"></i></p-button>
     </div>
   </form>
