@@ -148,7 +148,7 @@
     <ng-template #body let-voucher>
       <tr>
         <td>
-          <p-button label="View" (click)="showDetailsToggle(voucher)"><i class="bi bi-eye-fill"></i> </p-button>
+          <p-button label="View" (click)="showDetailsToggle(voucher)" styleClass="p-button-sm" ><i class="bi bi-eye-fill"></i> </p-button>
         </td>
         <td>{{ voucher.entryDate | date: 'yyyy-MM-dd' }}</td>
         <td>{{ voucher.voucherNo }}</td>

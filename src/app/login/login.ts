@@ -59,6 +59,20 @@ export class Login implements OnInit {
             localStorage.setItem('isCollapsed', 'true');
             localStorage.setItem('access_token', res.token);
             this.sidebar.toggleCollapsed();
+
+            const updatedMenu = this.sidebar.menuItemsSubject.value.map(item => {
+              if (item.children?.length) {
+                item.children = item.children.map(child => ({
+                  ...child,
+                  hasAccess: true 
+                }));
+              } else {                
+                item.hasAccess = true;
+              }
+              return item;
+            });
+            this.sidebar.updateMenuItems(updatedMenu);
+
             this.authService.startAutoLogoutWatcher();
             this.router.navigate(['/app/dashboard']);
             this.msgSvc.showSuccessMsg('Loggedin Successfully.');
