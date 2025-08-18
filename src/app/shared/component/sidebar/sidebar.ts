@@ -4,6 +4,7 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { filter } from 'rxjs';
+import { Authsvc } from '../../services/authsvc';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,10 +26,12 @@ export class Sidebar {
 
   constructor(
     public sidebarCollapse: SidebartoggleDataService,
-    private router: Router
+    private router: Router,
+    private authSvc:Authsvc
   ) {}
 
   ngOnInit(): void {
+    this.prepareMenu();
     // Subscribe to menuItems from service
     this.sidebarCollapse.menuItems$.subscribe(items => {
       this.menuItems = items;
@@ -38,6 +41,17 @@ export class Sidebar {
     // Subscribe to route changes
     this.router.events.pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => this.updateActiveMenu());
+  }
+
+  prepareMenu(){
+    try {
+      const userInfo=this.authSvc.getLoggedUserInfo();
+      if(userInfo){
+        this.sidebarCollapse.updateMenuItems(userInfo);
+      }
+    } catch (error) {
+      
+    }
   }
 
   updateActiveMenu() {

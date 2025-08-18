@@ -11,6 +11,7 @@
 
   <ul class="list-unstyled p-3">
     @for (item of menuItems; track $index) {
+       @if(item.hasAccess){
       <li>
         <!-- If item has children -->
         @if (item.children?.length) {
@@ -49,8 +50,7 @@
           </ul>
         }
         <!-- If item has no children -->
-        @else {
-          @if(item.hasAccess){
+        @else {         
             <a
             href="javascript:void(0)"
             (click)="routeToPage(item)"
@@ -61,10 +61,10 @@
             "
           >
             {{ item.label }}
-          </a>
-          }
+          </a>          
         }
       </li>
+    }
     }
   </ul>
 </nav>

@@ -17,12 +17,14 @@
     </div>
 </div>
 <div class="row mt-3 g-3">
+    @for (item of items; track $index) {
+    @if(item.hasAccess){
     <div class="col-md-4">
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">
                     Go To
-                    <a href="javascript:void(0)" (click)="routesToPage('check-pending')">
+                    <a href="javascript:void(0)" (click)="routesToPage(item.label)">
                         <span
                             class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center ms-2"
                             style="width: 32px; height: 32px;">
@@ -30,45 +32,12 @@
                         </span>
                     </a>
                 </h5>
-                <p class="card-text">Check Pending</p>
-                <a href="javascript:void(0)" (click)="routesToPage('check-pending')" class="btn btn-primary w-100">More Info</a>
+                <p class="card-text">{{item.title}}</p>
+                <a href="javascript:void(0)" (click)="routesToPage('check-pending')" class="btn btn-primary w-100">More
+                    Info</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">
-                    Go To
-                    <a href="javascript:void(0)" (click)="routesToPage('approval-pending')">
-                        <span
-                            class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center ms-2"
-                            style="width: 32px; height: 32px;">
-                            <i class="bi bi-arrow-right"></i>
-                        </span>
-                    </a>
-                </h5>
-                <p class="card-text">Approval Pending</p>
-                <a href="javascript:void(0)" (click)="routesToPage('approval-pending')" class="btn btn-primary w-100">More Info</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">
-                    Go To
-                    <a href="javascript:void(0)" (click)="routesToPage('referral-pending')">
-                        <span
-                            class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center ms-2"
-                            style="width: 32px; height: 32px;">
-                            <i class="bi bi-arrow-right"></i>
-                        </span>
-                    </a>
-                </h5>
-                <p class="card-text">Referral Pending</p>
-                <a href="javascript:void(0)" (click)="routesToPage('referral-pending')" class="btn btn-primary w-100">More Info</a>
-            </div>
-        </div>
-    </div>
+    }
+    }
 </div>

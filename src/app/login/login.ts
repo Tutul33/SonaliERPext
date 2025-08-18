@@ -52,28 +52,15 @@ export class Login implements OnInit {
 
       this.dataSvc.login(userName, password).subscribe({
         next: (res: any) => {
-          if (res) {
-            this.loadingService.hide();
+          if (res) {            
             this.authService.login();
             localStorage.setItem('userInfo', JSON.stringify(res.userInfo));
             localStorage.setItem('isCollapsed', 'true');
             localStorage.setItem('access_token', res.token);
-            this.sidebar.toggleCollapsed();
-
-            const updatedMenu = this.sidebar.menuItemsSubject.value.map(item => {
-              if (item.children?.length) {
-                item.children = item.children.map(child => ({
-                  ...child,
-                  hasAccess: true 
-                }));
-              } else {                
-                item.hasAccess = true;
-              }
-              return item;
-            });
-            this.sidebar.updateMenuItems(updatedMenu);
-
+            this.sidebar.toggleCollapsed();            
+            //this.sidebar.updateMenuItems(res.userInfo);
             this.authService.startAutoLogoutWatcher();
+            this.loadingService.hide();
             this.router.navigate(['/app/dashboard']);
             this.msgSvc.showSuccessMsg('Loggedin Successfully.');
           }

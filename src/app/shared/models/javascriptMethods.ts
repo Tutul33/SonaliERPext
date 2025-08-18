@@ -3,6 +3,7 @@ import { TreeNode } from 'primeng/api';
 
 export class GlobalMethods {
   static isProduction = false;
+  static roleAdmin='Admin';
   static ApiUrl() {
     return GlobalMethods.isProduction ? 'http://localhost:8081/api/' : 'http://localhost:5020/api/';
   }
