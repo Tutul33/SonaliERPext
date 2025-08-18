@@ -4,6 +4,9 @@ import { TreeNode } from 'primeng/api';
 export class GlobalMethods {
   static isProduction = false;
   static roleAdmin='Admin';
+  static rowsPerPageOptions=[10, 25, 50, 100, 500, 1000,3000,5000,7000,10000];
+  static pageSize=10;
+  static pageNumber=1;
   static ApiUrl() {
     return GlobalMethods.isProduction ? 'http://localhost:8081/api/' : 'http://localhost:5020/api/';
   }

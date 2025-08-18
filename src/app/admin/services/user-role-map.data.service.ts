@@ -12,16 +12,22 @@ export class UserRoleMapDataService {
 
    }
    
-   getVoucherApprovalList(): Observable<any> {      
+   getUserRoleMapList(): Observable<any> {      
       return this.http.get<any>(
          this.url + `GetUsersRoleMap`
       );
    }
 
-   UpdateUserRoleMap(data:any): Observable<any> {
+   updateUserRoleMap(data:any): Observable<any> {
         return this.http.post<any>(
             this.url+`UpdateUserRoleMap`,
             data
         );
     }
+
+    getFinanceAndAccountUsersRole(): Observable<any> {      
+      return this.http.get<any>(
+         this.url + `GetFinanceAndAccountUsersRole`
+      );
+   }
 }

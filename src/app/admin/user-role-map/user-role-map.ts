@@ -65,7 +65,7 @@ export class UserRoleMap {
   getUserRoleMapList() {
     try {
       this.loading = true;
-      this.dataSvc.getVoucherApprovalList().subscribe({
+      this.dataSvc.getUserRoleMapList().subscribe({
         next: (res: any) => {
           this.loading = false;
           this.modelSvc.prepareUserMapList(res.list);
@@ -167,7 +167,7 @@ export class UserRoleMap {
       this.loadingService.show();
       setTimeout(() => {
         const data = this.modelSvc.prepareDataBeforeSave();
-        this.dataSvc.UpdateUserRoleMap(data).subscribe({
+        this.dataSvc.updateUserRoleMap(data).subscribe({
           next: (res: any) => {
             this.loadingService.hide();
             this.msgSvc.showSuccessMsg("Saved Successfully.");

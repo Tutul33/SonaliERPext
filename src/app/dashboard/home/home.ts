@@ -79,7 +79,7 @@ export class Home {
   routesToPage(status: string) {
     try {
       this.router.navigate(['/app/accounting/voucher-approval'], {
-        queryParams: { status: status }
+        queryParams: { status: status,year:this.selectedYear.year }
       });
     } catch (error) {
       this.msgSvc.showErrorMsg(error);

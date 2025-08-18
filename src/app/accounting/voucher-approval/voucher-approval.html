@@ -60,7 +60,7 @@
 @if(!isShowDetailVoucher){
   <p-table #dt2 [value]="listVoucher" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [paginator]="true"
     [rows]="pageSize" [totalRecords]="totalRecords"
-    [rowsPerPageOptions]="[10, 25, 50, 100, 500, 1000,3000,5000,7000,10000]" [loading]="loading" dataKey="id"
+    [rowsPerPageOptions]="rowsPerPageOptions" [loading]="loading" dataKey="id"
     [globalFilterFields]="['voucherNo', 'user.name']" [tableStyle]="{ 'min-width': '75rem','min-height': '500px' ,'border': '1px solid #e5e5e5'}">
     <ng-template #caption>
       <div class="d-flex align-items-center">
@@ -199,9 +199,11 @@
     </div>
   </div>
   <div class="row m-3">
-    <div class="col-md-12 mb-3">
+    @if(modelSvc.status=='referral-pending'){
+      <div class="col-md-12 mb-3">
       <p-button label="Add" (onClick)="addNewVoucherItem()" styleClass="float-end p-button-sm"><i class="bi bi-plus"></i></p-button>
     </div>
+    }
     <p-table class="rounded-table" [value]="modelSvc.voucherModel.voucherItems" [sortOrder]="-1">
       <ng-template #header>
         <tr>

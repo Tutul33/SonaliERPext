@@ -9,6 +9,7 @@ import { EntityState, GlobalMethods } from '../../../shared/models/javascriptMet
 export class VoucherModelService {
   voucherModel: Voucher = new Voucher();
   status: any = '';
+  year: any = '';
   loggedBy: string = '';
   listFinanceBankingUser: any[] = [];
   selectedSubLedgers: any[] = [];

@@ -62,15 +62,15 @@ export class VoucherApproval {
   financeBankingUser: any;
   @ViewChild('voucherFilterBtn') voucherFilterBtn!: any;
   @ViewChild('userFilterBtn') userFilterBtn!: any;
-  sortByEntryDate:string='ASC';
-  sortOrder:number=1;
+  sortByEntryDate: string = 'ASC';
+  sortOrder: number = 1;
   referralForm!: FormGroup;
-
+  rowsPerPageOptions: any = GlobalMethods.rowsPerPageOptions;
+  pageNumber: number = GlobalMethods.pageNumber;
+  pageSize: number = GlobalMethods.pageSize;
   //
   userIds: any = '';
   voucherNos: any = '';
-  pageNumber: number = 1;
-  pageSize: number = 500;
   totalRecords: number = 0;
   listVoucher: any[] = [];
   ddlUsers: any[] = [];
@@ -91,12 +91,10 @@ export class VoucherApproval {
     private msgSvc: InformationService,
     private authSvc: Authsvc,
     private confirmDialog: ConfirmationDialogService,
-    private cd: ChangeDetectorRef
+    //private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
-    this.fromDate = new Date();
-    this.toDate = new Date();
     this.searchDebounce$.pipe(
       debounceTime(500)
     ).subscribe(() => {
@@ -105,6 +103,8 @@ export class VoucherApproval {
 
     this.route.queryParams.subscribe(params => {
       this.modelSvc.status = params['status'] || '';
+      this.modelSvc.year = params['year'] || '';
+      this.setFilterDate();
       this.isShowDetailVoucher = false;
       this.userIds = '';
       this.voucherNos = '';
@@ -121,6 +121,28 @@ export class VoucherApproval {
       this.setLoggedUserInfo();
       this.getFinanceAndAccountUsers();
     }, 0);
+  }
+
+  private setFilterDate() {
+    try {
+      const year = this.modelSvc.year;
+
+      if (
+        year &&
+        !isNaN(Number(year)) &&         
+        year.toString().length === 4 &&  
+        Number(year) >= 2012             
+      ) {
+        const currentDate = new Date();
+        this.fromDate = new Date(Number(year), currentDate.getMonth(), currentDate.getDate());
+        this.toDate = new Date(Number(year), currentDate.getMonth(), currentDate.getDate());
+      } else {
+        this.fromDate = new Date();
+        this.toDate = new Date();
+      }
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
   }
 
   createReferralForm() {
@@ -185,7 +207,7 @@ export class VoucherApproval {
       this.selectedUsers = [];
       this.selectedVoucherNos = [];
       this.isShowDetailVoucher = false;
-      this.financeBankingUser="";
+      this.financeBankingUser = "";
       this.searchDebounce$.next();
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
@@ -229,11 +251,11 @@ export class VoucherApproval {
       }
     });
   }
-  
-  sortData(){
+
+  sortData() {
     try {
-      this.sortOrder=this.sortOrder==1?-1:1;
-     this.listVoucher=this.modelSvc.prepareSortData({sortField:'entryDate',sortOrder:this.sortOrder},this.listVoucher)
+      this.sortOrder = this.sortOrder == 1 ? -1 : 1;
+      this.listVoucher = this.modelSvc.prepareSortData({ sortField: 'entryDate', sortOrder: this.sortOrder }, this.listVoucher)
     } catch (error) {
       console.error('Data load failed', error);
     }
@@ -421,7 +443,7 @@ export class VoucherApproval {
   addNewVoucherItem() {
     try {
       this.modelSvc.addNewVoucherItem(this.modelSvc.voucherItem);
-      this.cd.detectChanges();
+      //this.cd.detectChanges();
       this.modelSvc.node = null;
       this.modelSvc.subLedgerNode = null;
       this.modelSvc.voucherItem = new VoucherItem();;

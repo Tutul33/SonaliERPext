@@ -21,7 +21,10 @@ export class SidebartoggleDataService {
       label: 'Users',
       route: '/app/admin',
       hasAccess: false,
-      children: [{ label: 'User Role Map', hasAccess: false, route: '/app/admin/user-role-map' }]
+      children: [
+        { label: 'User Role Map', hasAccess: false, route: '/app/admin/user-role-map' },
+        { label: 'User Role', hasAccess: false, route: '/app/admin/user-role' }
+      ]
     },
     { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
     { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
