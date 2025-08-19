@@ -96,19 +96,6 @@ Contains reusable functionalities:
 - **Pipes:** Custom formatting & transformation
 - **Directives:** DOM manipulation & validations
 
-**Example:**
-
-```typescript
-import { SharedModule } from './shared/shared.module';
-
-@NgModule({
-  imports: [
-    SharedModule
-  ]
-})
-export class AccountingModule { }
-```
-
 ---
 
 ## Services
