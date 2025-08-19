@@ -1,6 +1,6 @@
 # SONALIERPEXT Angular 19 Application
 
-This is a **modular Angular 19 application** designed for enterprise resource planning (ERP) functionalities. It uses **lazy-loaded modules**, a **shared module** for reusable code, and **PrimeNG** for UI components and styles.
+This is a **modular Angular 19 application** designed for enterprise resource planning (ERP) functionalities. It uses **lazy-loaded modules**, **component-specific models/services/data services**, a **shared module** for reusable code, and **PrimeNG** for UI components and styles.
 
 ---
 
@@ -32,12 +32,12 @@ The application follows a **modular architecture** with clear separation of conc
                  +----------------+----------------+
                  |                                 |
            Lazy-loaded Modules                Shared Module
-    (Accounting, Admin, Dashboard,          +--------------------+
-       Default, Login, etc.)                |  Services          |
-                                            |  Pipes             |
-                                            |  Directives        |
-                                            |  Models            |
-                                            +--------------------+
+   (Accounting, Admin, Dashboard,           +--------------------+
+      Default, Login, etc.)                 |  Services          |
+                                             |  Pipes             |
+                                             |  Directives        |
+                                             |  Models            |
+                                             +--------------------+
                                   |
                              PrimeNG Styles
                        (UI components, themes, CSS)
@@ -45,12 +45,10 @@ The application follows a **modular architecture** with clear separation of conc
 
 **Key Points:**
 
-- Each main feature is **lazy-loaded** to reduce initial bundle size.
-- Shared module contains **services, pipes, directives, and models** used across modules.
-- PrimeNG is used for **UI components, table/grid styling, dropdowns, buttons, dialogs**, and global CSS.
-- Services are divided into:
-  - `modelSvc.ts` → module-specific business logic
-  - `dataSvc.ts` → HTTP API calls
+- Each main feature is **lazy-loaded**.
+- Modules contain **component-specific **``**, **``**, and **``.
+- Shared module provides **global services, pipes, directives, and models**.
+- PrimeNG is used for **UI components, table/grid styling, dropdowns, buttons, dialogs**.
 
 ---
 
@@ -59,12 +57,17 @@ The application follows a **modular architecture** with clear separation of conc
 ```
 src/
 └── app/
-    ├── accounting/     # Lazy-loaded accounting module
-    ├── admin/          # Lazy-loaded admin module
-    ├── dashboard/      # Lazy-loaded dashboard module
-    ├── default/        # Lazy-loaded default views
-    ├── login/          # Lazy-loaded login/auth module
-    └── shared/         # Shared module with common services, models, pipes, directives
+    ├── accounting/           # Lazy-loaded accounting module
+    │   ├── models/           # Component-specific models
+    │   ├── services/         # Component-specific services
+    │   └── voucher-approval/ # Feature components with their own model, modelSvc, dataSvc
+    │   ├── accounting-module.ts
+    │   └── accounting-routing-module.ts
+    ├── admin/                # Lazy-loaded admin module
+    ├── dashboard/            # Lazy-loaded dashboard module
+    ├── default/              # Lazy-loaded default views
+    ├── login/                # Lazy-loaded login/auth module
+    └── shared/               # Shared module with common services, models, pipes, directives
 
 Root files:
 - app.config.ts      # Application configuration
@@ -77,38 +80,40 @@ Root files:
 
 ## Modules
 
-Each lazy-loaded module has **component-specific** files:
+Each lazy-loaded module contains **component-specific files**:
 
-- `model.ts` → Component-specific data models within the module
+- `model.ts` → Component-specific data models
 - `modelSvc.ts` → Component-specific business logic and operations
-- `dataSvc.ts` → Component-specific HTTP calls to backend APIs
+- `dataSvc.ts` → Component-specific HTTP API calls
 
-This structure ensures each component's data, logic, and API handling is encapsulated within its module, making the code maintainable, scalable, and testable.
+This ensures each component's data, logic, and API handling is encapsulated and maintainable.
 
 ---
 
 ## Shared Module
 
-Contains reusable functionalities:
+Provides reusable functionalities across modules:
 
 - **Services:** Global utilities, auth, state management
 - **Models:** Shared TypeScript interfaces
 - **Pipes:** Custom formatting & transformation
 - **Directives:** DOM manipulation & validations
 
+**Note:** Angular 19 recommends using `providedIn: 'root'` for services instead of importing the SharedModule in lazy-loaded modules.
+
 ---
 
 ## Services
 
-- Module-specific services (`modelSvc`, `dataSvc`) handle business logic & HTTP calls
+- Component-specific services (`modelSvc`, `dataSvc`) handle local business logic & HTTP calls
 - Shared services provide cross-module utilities (e.g., logging, notifications)
 
 ---
 
 ## Models
 
-- Each module has **own models** for encapsulating its data
-- Shared models are used across multiple modules
+- Component-specific models encapsulate module data
+- Shared models are used across modules
 
 ---
 
@@ -152,8 +157,3 @@ ng build --prod
 - Submit a pull request for review
 
 ---
-
-## License
-
-This project is licensed under the **MIT License**.
-
