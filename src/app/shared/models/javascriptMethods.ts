@@ -7,6 +7,7 @@ export class GlobalMethods {
   static rowsPerPageOptions=[10, 25, 50, 100, 500, 1000,3000,5000,7000,10000];
   static pageSize=10;
   static pageNumber=1;
+
   static ApiUrl() {
     return GlobalMethods.isProduction ? 'http://localhost:8081/api/' : 'http://localhost:5020/api/';
   }
@@ -33,6 +34,7 @@ export class GlobalMethods {
     }
     return null;
   }
+
   static getDistinctBy<T>(data: T[], property: keyof T): T[] {
     try {
       const seen = new Set<any>();
@@ -51,6 +53,7 @@ export class GlobalMethods {
       return error as any;
     }
   }
+
   static closeDropdown(closeBtn) {
     try {
       closeBtn.nativeElement.click();
@@ -58,6 +61,7 @@ export class GlobalMethods {
       return error as any;
     }
   }
+  
 }
 
 export const EntityState = {
