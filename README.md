@@ -77,13 +77,13 @@ Root files:
 
 ## Modules
 
-Each lazy-loaded module has:
+Each lazy-loaded module has **component-specific** files:
 
-- `model.ts` → Module-specific data models
-- `modelSvc.ts` → Business logic and module operations
-- `dataSvc.ts` → HTTP calls to backend APIs
+- `model.ts` → Component-specific data models within the module
+- `modelSvc.ts` → Component-specific business logic and operations
+- `dataSvc.ts` → Component-specific HTTP calls to backend APIs
 
-This separation ensures maintainable, scalable, and testable code.
+This structure ensures each component's data, logic, and API handling is encapsulated within its module, making the code maintainable, scalable, and testable.
 
 ---
 
