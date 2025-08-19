@@ -59,6 +59,7 @@ export class GlobalMethods {
     }
   }
 }
+
 export const EntityState = {
   /**
    * The entity is not being tracked by the context.
