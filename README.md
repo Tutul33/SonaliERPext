@@ -271,7 +271,7 @@ constructor(private store: Store, private modelSvc: ModelService) {
 ## Setup & Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Tutul33/SonaliERPext.git
 cd SONALIERPEXT
 npm install
 ```
