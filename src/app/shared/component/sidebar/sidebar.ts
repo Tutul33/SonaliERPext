@@ -3,8 +3,9 @@ import { SidebartoggleDataService } from '../../services/sidebartoggle.data.serv
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { filter } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { Authsvc } from '../../services/authsvc';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-sidebar',
@@ -20,6 +21,7 @@ import { Authsvc } from '../../services/authsvc';
   ]
 })
 export class Sidebar {
+  loggedUser$: Observable<any | null>;
   menuItems: any[] = [];
   openMenuIndex: number | null = null;
   activeChildRoute: any = null;
@@ -27,7 +29,8 @@ export class Sidebar {
   constructor(
     public sidebarCollapse: SidebartoggleDataService,
     private router: Router,
-    private authSvc:Authsvc
+    private authSvc:Authsvc,
+    private store: Store,
   ) {}
 
   ngOnInit(): void {
@@ -45,10 +48,15 @@ export class Sidebar {
 
   prepareMenu(){
     try {
-      const userInfo=this.authSvc.getLoggedUserInfo();
-      if(userInfo){
-        this.sidebarCollapse.updateMenuItems(userInfo);
+      this.loggedUser$.subscribe(user => {
+      if (user) {
+        this.sidebarCollapse.updateMenuItems(user);
       }
+    });
+      // const userInfo=this.authSvc.getLoggedUserInfo();
+      // if(userInfo){
+      //   this.sidebarCollapse.updateMenuItems(userInfo);
+      // }
     } catch (error) {
       
     }

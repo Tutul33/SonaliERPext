@@ -53,7 +53,7 @@ export class Login implements OnInit {
       this.dataSvc.login(userName, password).subscribe({
         next: (res: any) => {
           if (res) {            
-            this.authService.login();
+            this.authService.login(res.userInfo, res.token);
             localStorage.setItem('userInfo', JSON.stringify(res.userInfo));
             localStorage.setItem('isCollapsed', 'true');
             localStorage.setItem('access_token', res.token);

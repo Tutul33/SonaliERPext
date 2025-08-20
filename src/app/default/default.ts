@@ -6,6 +6,10 @@ import { Authsvc } from '../shared/services/authsvc';
 import { Sidebar } from '../shared/component/sidebar/sidebar';
 import { Footer } from "../shared/component/footer/footer";
 import { SidebartoggleDataService } from '../shared/services/sidebartoggle.data.service';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectIsLoggedIn } from '../shared/store/auth.selectors';
+import { logout } from '../shared/store/auth.actions';
 
 @Component({
   selector: 'app-default',
@@ -14,19 +18,21 @@ import { SidebartoggleDataService } from '../shared/services/sidebartoggle.data.
   styleUrl: './default.css'
 })
 export class Default {
+  isLoggedIn$!: Observable<boolean>;
   sidebarCollapsed = true;
-  constructor(public auth:Authsvc,private router:Router,public sidebarCollapse: SidebartoggleDataService,){
+  constructor(public auth:Authsvc,private router:Router,public sidebarCollapse: SidebartoggleDataService, private store: Store){
 
   }
   
   ngOnInit(){
     this.sidebarCollapsed=false;
+    this.isLoggedIn$ = this.store.select(selectIsLoggedIn);
   }
  toggleSidebar(){
   this.sidebarCollapsed=!this.sidebarCollapsed;
  }
   logout() {
-  this.auth.logout();
+  this.store.dispatch(logout());
   this.router.navigate(['/login']);
   }
 }

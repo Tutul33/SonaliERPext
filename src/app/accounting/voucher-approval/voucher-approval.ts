@@ -15,7 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { InformationService } from '../../shared/services/information-service';
 import { DialogModule } from 'primeng/dialog';
 import { VoucherModelService } from '../services/voucher/voucher.model.service';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Observable, Subject } from 'rxjs';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { VoucherItem } from '../models/voucher.model';
 import { Authsvc } from '../../shared/services/authsvc';
@@ -24,6 +24,8 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { Referral } from '../models/Referral.model';
 import { TextareaModule } from 'primeng/textarea';
 import { GlobalMethods } from '../../shared/models/javascriptMethods';
+import { Store } from '@ngrx/store';
+import { selectCurrentUser } from '../../shared/store/auth.selectors';
 
 
 @Component({
@@ -53,6 +55,7 @@ import { GlobalMethods } from '../../shared/models/javascriptMethods';
   ]
 })
 export class VoucherApproval {
+  loggedUser$: Observable<any | null>;
   //Search Parameter
   search: any = '';
   fromDate: any;
@@ -84,6 +87,7 @@ export class VoucherApproval {
   private searchDebounce$ = new Subject<void>();
   isShowDetailVoucher: boolean = false;
   constructor(
+    private store: Store,
     private fb: FormBuilder,
     private dataSvc: VoucherDataService,
     public modelSvc: VoucherModelService,
@@ -92,7 +96,9 @@ export class VoucherApproval {
     private authSvc: Authsvc,
     private confirmDialog: ConfirmationDialogService,
     //private cd: ChangeDetectorRef
-  ) { }
+  ) { 
+    this.loggedUser$ = this.store.select(selectCurrentUser);
+  }
 
   ngOnInit() {
     this.searchDebounce$.pipe(
@@ -163,10 +169,15 @@ export class VoucherApproval {
 
   setLoggedUserInfo() {
     try {
-      const loggedUser = this.authSvc.getLoggedUserInfo();
-      if (loggedUser) {
-        this.modelSvc.loggedBy = loggedUser.userName;
+      this.loggedUser$.subscribe(user => {
+      if (user) {
+        this.modelSvc.loggedBy = user.userName;
       }
+    });
+      // const loggedUser = this.authSvc.getLoggedUserInfo();
+      // if (loggedUser) {
+      //   this.modelSvc.loggedBy = loggedUser.userName;
+      // }
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
     }

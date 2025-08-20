@@ -1,8 +1,8 @@
-
-@if(!(auth.isLoggedIn$ | async)){
-<router-outlet></router-outlet>
+@if(!(isLoggedIn$ | async)){
+  <router-outlet></router-outlet>
 }
-@if((auth.isLoggedIn$ | async)){
+
+@if((isLoggedIn$ | async)){
 <div class="layout-wrapper d-flex">
   <!-- Sidebar -->
   <app-sidebar class="bg-light"></app-sidebar>
@@ -11,9 +11,9 @@
   <div class="flex-grow-1 d-flex flex-column">
     <!-- Top Navbar -->
     <app-header [ngClass]="{
-    'app-header-expanded': !(sidebarCollapse.isCollapsed$ | async),
-    'app-header-collapsed': (sidebarCollapse.isCollapsed$ | async)
-  }"></app-header>
+      'app-header-expanded': !(sidebarCollapse.isCollapsed$ | async),
+      'app-header-collapsed': (sidebarCollapse.isCollapsed$ | async)
+    }"></app-header>
 
     <!-- Main Content -->
     <main class="flex-grow-1 p-4">
