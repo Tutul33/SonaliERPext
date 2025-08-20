@@ -57,4 +57,23 @@ export class Authsvc {
       return null;
     }
   }
+
+  // ✅ Add these for the guard
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+  get isLoggedInValue(): boolean { 
+    const token = localStorage.getItem('access_token');
+    return !!token && !this.isTokenExpired();
+  }
+
+  isTokenExpired(): boolean {
+    const token = localStorage.getItem('access_token');
+    if (!token) return true;
+
+    const expiry = this.getTokenExpirationDate(token);
+    if (!expiry) return true;
+
+    return new Date() > expiry;
+  }
 }

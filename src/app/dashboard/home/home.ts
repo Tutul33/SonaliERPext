@@ -3,8 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SelectModule } from 'primeng/select';
 import { InformationService } from '../../shared/services/information-service';
-import { Authsvc } from '../../shared/services/authsvc';
 import { GlobalMethods } from '../../shared/models/javascriptMethods';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,7 @@ import { GlobalMethods } from '../../shared/models/javascriptMethods';
   styleUrl: './home.css'
 })
 export class Home {
+  loggedUser$: Observable<any | null>;
   selectedYear: any;
   years: any[] = [];
   items: any[] = [
@@ -32,7 +34,7 @@ export class Home {
       hasAccess: false,
     }
   ];
-  constructor(private router: Router, private msgSvc: InformationService, private authSvc: Authsvc) {
+  constructor(private router: Router, private msgSvc: InformationService, private store: Store,) {
   }
 
   ngOnInit() {
@@ -42,9 +44,9 @@ export class Home {
 
   prepareAccess() {
     try {
-      const userInfo = this.authSvc.getLoggedUserInfo();
+      this.loggedUser$.subscribe(userInfo => {
       if (userInfo) {
-        if (userInfo.payRoleName == GlobalMethods.roleAdmin) {
+         if (userInfo.payRoleName == GlobalMethods.roleAdmin) {
           this.items.forEach((item) => {
             item.hasAccess = true;
           });
@@ -57,6 +59,22 @@ export class Home {
           }
         }
       }
+    });
+      // const userInfo = this.authSvc.getLoggedUserInfo();
+      // if (userInfo) {
+      //   if (userInfo.payRoleName == GlobalMethods.roleAdmin) {
+      //     this.items.forEach((item) => {
+      //       item.hasAccess = true;
+      //     });
+      //   } else {
+      //     if (userInfo.roleList?.length) {
+      //       const roleList = userInfo.roleList;
+      //       this.items.forEach((item) => {
+      //         item.hasAccess = roleList.find(x => item.title.includes(x.roleName)) ? true : false;
+      //       });
+      //     }
+      //   }
+      // }
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
     }
