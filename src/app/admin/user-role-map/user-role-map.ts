@@ -66,7 +66,8 @@ export class UserRoleMap {
     try {
       this.loading = true;
       this.dataSvc.getUserRoleMapList().subscribe({
-        next: (res: any) => {
+        next: (response: any) => {
+          const res=response.data;
           this.loading = false;
           this.modelSvc.prepareUserMapList(res.list);
         },

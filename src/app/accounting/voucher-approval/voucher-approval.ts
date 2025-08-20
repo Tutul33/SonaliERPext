@@ -93,9 +93,8 @@ export class VoucherApproval {
     public modelSvc: VoucherModelService,
     private route: ActivatedRoute,
     private msgSvc: InformationService,
-    private confirmDialog: ConfirmationDialogService,
-    //private cd: ChangeDetectorRef
-  ) { 
+    private confirmDialog: ConfirmationDialogService
+  ) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
   }
 
@@ -134,9 +133,9 @@ export class VoucherApproval {
 
       if (
         year &&
-        !isNaN(Number(year)) &&         
-        year.toString().length === 4 &&  
-        Number(year) >= 2012             
+        !isNaN(Number(year)) &&
+        year.toString().length === 4 &&
+        Number(year) >= 2012
       ) {
         const currentDate = new Date();
         this.fromDate = new Date(Number(year), currentDate.getMonth(), currentDate.getDate());
@@ -169,14 +168,10 @@ export class VoucherApproval {
   setLoggedUserInfo() {
     try {
       this.loggedUser$.subscribe(user => {
-      if (user) {
-        this.modelSvc.loggedBy = user.userName;
-      }
-    });
-      // const loggedUser = this.authSvc.getLoggedUserInfo();
-      // if (loggedUser) {
-      //   this.modelSvc.loggedBy = loggedUser.userName;
-      // }
+        if (user) {
+          this.modelSvc.loggedBy = user.userName;
+        }
+      });
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
     }
@@ -246,7 +241,8 @@ export class VoucherApproval {
     }
     this.loading = true;
     this.dataSvc.getVoucherApprovalList(this.search, this.fromDate, this.toDate, this.voucherType, this.userIds || '', this.voucherNos || '', this.modelSvc.status, this.pageNumber, this.pageSize).subscribe({
-      next: (res: any) => {
+      next: (response: any) => {
+        const res=response.data;
         if (res) {
           this.listVoucher = res.list;
           this.totalRecords = this.listVoucher.length ? this.listVoucher[0].totalCount : 0;
@@ -375,7 +371,8 @@ export class VoucherApproval {
   getChartOfAccounts() {
     try {
       this.dataSvc.getChartOfAccounts().subscribe({
-        next: (res: any) => {
+        next: (response: any) => {
+          const res=response.data;
           if (res) {
             if (res.list.length > 0) {
               this.modelSvc.prepareBaseChartAccounts(res.list);
@@ -394,7 +391,8 @@ export class VoucherApproval {
   getFinanceAndAccountUsers() {
     try {
       this.dataSvc.GetFinanceAndAccountUsers().subscribe({
-        next: (res: any) => {
+        next: (response: any) => {
+          const res=response.data;
           if (res) {
             if (res.list.length > 0) {
               this.modelSvc.listFinanceBankingUser = res.list;
@@ -502,7 +500,8 @@ export class VoucherApproval {
   getVoucherDetails(voucher) {
     try {
       this.dataSvc.getVoucherDetailByVoucherNo(voucher.voucherNo).subscribe({
-        next: (res: any) => {
+        next: (response: any) => {
+          const res=response.data;
           if (res) {
             const listVoucher = res.voucherList;
             if (listVoucher && listVoucher.length > 0) {
@@ -545,7 +544,8 @@ export class VoucherApproval {
       const data = this.modelSvc.prepareBeforeSave();
       if (this.modelSvc.status == 'check-pending' || this.modelSvc.status == 'approval-pending') {
         this.dataSvc.UpdateVoucherCheckApprove(data).subscribe({
-          next: (res: any) => {
+          next: (response: any) => {
+          const res=response.data;
             if (res) {
               this.isShowDetailVoucher = false;
             }
@@ -556,7 +556,8 @@ export class VoucherApproval {
         });
       } else {
         this.dataSvc.updateVoucher(data).subscribe({
-          next: (res: any) => {
+          next: (response: any) => {
+          const res=response.data;
             if (res) {
               this.isShowDetailVoucher = false;
             }
@@ -592,7 +593,8 @@ export class VoucherApproval {
     try {
       const data = this.modelSvc.prepareReferDataBeforeSave(this.referralForm.value);
       this.dataSvc.referVoucher(data).subscribe({
-        next: (res: any) => {
+        next: (response: any) => {
+          const res=response.data;
           if (res) {
             this.isShowDetailVoucher = false;
             this.visibleModal = false;

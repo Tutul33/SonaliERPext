@@ -28,7 +28,7 @@ export class UserRole {
     try {
       this.dataSvc.getFinanceAndAccountUsersRole().subscribe({
         next: (res) => {
-          this.userRoles = res.list;
+          this.userRoles = res.data?.list;
         },
         error: (error) => {
           this.msgSvc.showErrorMsg(error);

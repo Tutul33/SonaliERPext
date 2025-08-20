@@ -6,6 +6,7 @@ import { InformationService } from '../../shared/services/information-service';
 import { GlobalMethods } from '../../shared/models/javascriptMethods';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { selectCurrentUser } from '../../shared/store/auth.selectors';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +36,7 @@ export class Home {
     }
   ];
   constructor(private router: Router, private msgSvc: InformationService, private store: Store,) {
+    this.loggedUser$ = this.store.select(selectCurrentUser);
   }
 
   ngOnInit() {

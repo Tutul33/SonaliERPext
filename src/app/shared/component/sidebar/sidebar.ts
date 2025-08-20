@@ -6,6 +6,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { filter, Observable } from 'rxjs';
 import { Authsvc } from '../../services/authsvc';
 import { Store } from '@ngrx/store';
+import { selectCurrentUser } from '../../store/auth.selectors';
 
 @Component({
   selector: 'app-sidebar',
@@ -31,7 +32,9 @@ export class Sidebar {
     private router: Router,
     private authSvc:Authsvc,
     private store: Store,
-  ) {}
+  ) {
+    this.loggedUser$ = this.store.select(selectCurrentUser);
+  }
 
   ngOnInit(): void {
     this.prepareMenu();
