@@ -93,7 +93,6 @@ export class VoucherApproval {
     public modelSvc: VoucherModelService,
     private route: ActivatedRoute,
     private msgSvc: InformationService,
-    private authSvc: Authsvc,
     private confirmDialog: ConfirmationDialogService,
     //private cd: ChangeDetectorRef
   ) { 

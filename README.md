@@ -13,6 +13,7 @@ This is a **modular Angular 19 application** designed for enterprise resource pl
 - [Services](#services)
 - [Models](#models)
 - [Pipes & Directives](#pipes--directives)
+- [Global State Management & Authentication](#global-state-management--authentication)
 - [Setup & Installation](#setup--installation)
 - [Build & Serve](#build--serve)
 - [Contributing](#contributing)
@@ -46,7 +47,7 @@ The application follows a **modular architecture** with clear separation of conc
 **Key Points:**
 
 - Each main feature is **lazy-loaded**.
-- Modules contain **component-specific **``**, **``**, and **``.
+- Modules contain **component-specific **``**, **``**, **``.
 - Shared module provides **global services, pipes, directives, and models**.
 - PrimeNG is used for **UI components, table/grid styling, dropdowns, buttons, dialogs**.
 
@@ -121,6 +122,149 @@ Provides reusable functionalities across modules:
 
 - **Custom Pipes** for formatting, filtering, transformations
 - **Reusable Directives** for validations and DOM behavior
+
+---
+
+## Global State Management & Authentication
+
+This application uses **NgRx** for **global state management** and a dedicated **Authsvc** service for authentication.
+
+### NgRx Store Setup
+
+- **Store provided in **``**:**
+
+```ts
+provideStore({ auth: authReducer })
+```
+
+- **State (**``**):**
+
+```ts
+export interface AuthState {
+  isLoggedIn: boolean;
+  user: User | null;
+  accessToken: string | null;
+}
+
+export const initialAuthState: AuthState = {
+  isLoggedIn: false,
+  user: null,
+  accessToken: null,
+};
+```
+
+- **Actions (**``**):**
+
+```ts
+export const loginSuccess = createAction(
+  '[Auth] Login Success',
+  props<{ user: User; token: string }>()
+);
+
+export const logout = createAction('[Auth] Logout');
+```
+
+- **Reducer (**``**):**
+
+```ts
+export const authReducer = createReducer(
+  initialAuthState,
+  on(loginSuccess, (state, { user, token }) => ({
+    ...state,
+    isLoggedIn: true,
+    user,
+    accessToken: token
+  })),
+  on(logout, () => ({
+    isLoggedIn: false,
+    user: null,
+    accessToken: null
+  }))
+);
+```
+
+- **Selectors (**``**):**
+
+```ts
+export const selectAuthState = createFeatureSelector<AuthState>('auth');
+export const selectCurrentUser = createSelector(selectAuthState, state => state.user);
+export const selectIsLoggedIn = createSelector(selectAuthState, state => state.isLoggedIn);
+export const selectAccessToken = createSelector(selectAuthState, state => state.accessToken);
+```
+
+### Authsvc Service
+
+Handles login, logout, and automatic logout based on JWT expiration.
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class Authsvc {
+  private logoutTimer: any;
+
+  constructor(private router: Router, private store: Store) {
+    const token = localStorage.getItem('access_token');
+    const user = localStorage.getItem('userInfo');
+    if (token && user) {
+      this.store.dispatch(loginSuccess({ user: JSON.parse(user), token }));
+      this.startAutoLogoutWatcher();
+    }
+  }
+
+  login(user: any, token: string) {
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('userInfo', JSON.stringify(user));
+    this.store.dispatch(loginSuccess({ user, token }));
+    this.startAutoLogoutWatcher();
+  }
+
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('userInfo');
+    this.store.dispatch(logout());
+    if (this.logoutTimer) clearTimeout(this.logoutTimer);
+    this.router.navigate(['/login']);
+  }
+
+  startAutoLogoutWatcher() {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    const expiry = this.getTokenExpirationDate(token);
+    if (!expiry) return;
+
+    const timeout = expiry.getTime() - new Date().getTime();
+    if (this.logoutTimer) clearTimeout(this.logoutTimer);
+
+    this.logoutTimer = setTimeout(() => this.logout(), timeout);
+  }
+
+  getTokenExpirationDate(token: string): Date | null {
+    try {
+      const decoded: any = JSON.parse(atob(token.split('.')[1]));
+      if (!decoded.exp) return null;
+      const date = new Date(0);
+      date.setUTCSeconds(decoded.exp);
+      return date;
+    } catch {
+      return null;
+    }
+  }
+}
+```
+
+### Usage Example
+
+```ts
+loggedUser$: Observable<any | null>;
+constructor(private store: Store, private modelSvc: ModelService) {
+  this.loggedUser$ = this.store.select(selectCurrentUser);
+  this.loggedUser$.subscribe(user => {
+    if (user) this.modelSvc.loggedBy = user.userName;
+  });
+}
+```
+
+✅ This setup ensures **centralized authentication state**, **auto-logout**, and **reactive user info distribution** across components.
 
 ---
 
