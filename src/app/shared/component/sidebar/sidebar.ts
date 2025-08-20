@@ -4,7 +4,6 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { filter, Observable } from 'rxjs';
-import { Authsvc } from '../../services/authsvc';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../store/auth.selectors';
 
@@ -30,7 +29,6 @@ export class Sidebar {
   constructor(
     public sidebarCollapse: SidebartoggleDataService,
     private router: Router,
-    private authSvc:Authsvc,
     private store: Store,
   ) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
