@@ -22,6 +22,10 @@ export const routes: Routes = [
       {
         path: 'accounting',
         loadChildren: () => import('./accounting/accounting-module').then(m => m.AccountingModule)
+      },
+      {
+        path: 'demo',
+        loadChildren: () => import('./demo/demo-module').then(m => m.DemoModule)
       }
     ]
   },

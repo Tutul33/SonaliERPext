@@ -28,7 +28,13 @@ export class SidebartoggleDataService {
     },
     { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
     { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
-    { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'referral-pending' } }
+    { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
+    {
+      label: 'Demo',
+      route: '/app/demo',
+      hasAccess: true,
+      children: [{ label: 'Demo Entry', hasAccess: true, route: '/app/demo/demo-entry' }]
+    },
   ]);
 
   public menuItems$: Observable<any[]> = this.menuItemsSubject.asObservable();
