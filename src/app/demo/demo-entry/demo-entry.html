@@ -5,82 +5,103 @@
     <div class="row mb-3">
       <div class="col-md-3">
         <label>Name</label><br>
-        <input pInputText formControlName="name" />
+        <input pInputText formControlName="name" class="w-100" />
       </div>
       <div class="col-md-3">
         <label>Create Date</label><br>
-        <p-datepicker formControlName="createDate" dateFormat="yy-mm-dd" [showIcon]="true"></p-datepicker>
+        <p-datepicker formControlName="createDate" dateFormat="yy-mm-dd" [showIcon]="true" class="w-100"></p-datepicker>
       </div>
-      <div class="col-md-3 flex align-items-center gap-2">
-        <label for="isActive">Is Active</label><br>
-        <p-checkbox formControlName="isActive" inputId="isActive"></p-checkbox>   
-      </div>
+
     </div>
 
     <p-divider></p-divider>
 
     <!-- Items -->
     <ng-container formArrayName="demoItems">
-      <div *ngFor="let item of demoItems.controls; let i = index" [formGroupName]="i" class="mb-3 p-3 border-1 surface-border rounded">
+      @for (item of demoItems.controls; track i; let i = $index) {
+      <div [formGroupName]="i" class="mb-3 p-3 border-1 surface-border rounded" style="border: 1px black dashed;">
 
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label>Name</label><br>
-            <input pInputText formControlName="name" />
+            <input pInputText formControlName="name" class="w-100" />
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label>Title</label><br>
-            <input pInputText formControlName="title" />
+            <input pInputText formControlName="title" class="w-100" />
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label>Description</label><br>
-            <textarea pInputTextarea formControlName="description"></textarea>
-          </div>
-          <div class="col-md-3 flex align-items-center gap-2">            
-            <label for="isActiveItem{{i}}">Active</label><br>
-            <p-checkbox formControlName="isActive" [inputId]="'isActiveItem' + i"></p-checkbox>
+            <textarea pInputTextarea formControlName="description" class="w-100"></textarea>
           </div>
         </div>
 
         <!-- Attachments Table -->
         <ng-container formArrayName="demoItemFileAttachments">
-            @if(attachmentsAt(i).length > 0){
-          <p-table  [value]="attachmentsAt(i).controls" size="small" [tableStyle]="{'min-width':'40rem'}">
+          @if(attachmentsAt(i).length > 0){
+          <p-table [value]="attachmentsAt(i).controls" size="small" [tableStyle]="{'min-width':'40rem'}">
             <ng-template pTemplate="header">
               <tr>
                 <th>File Name</th>
-                <th>Active</th>
+                <th>Preview</th>
                 <th>Action</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-att let-j="rowIndex">
               <tr [formGroupName]="j">
                 <td>
-                    <p-fileupload #fu mode="basic" chooseLabel="Choose" chooseIcon="pi pi-upload" name="demo[]" url="https://www.primefaces.org/cdn/api/upload.php" accept="image/*" maxFileSize="1000000" (onUpload)="onUpload($event)" />
+                  <div class="d-flex justify-content-start">
+                    <p-fileupload #fu mode="basic" chooseLabel="Choose" chooseIcon="pi pi-upload" name="demo[]"
+                      [multiple]="false" accept="image/*" maxFileSize="1000000" styleClass="p-button-sm" [auto]="true"
+                      (onSelect)="onFileSelect($event,i,j)" />
+                    <div class="mt-1">
+                      <small class="text-muted">
+                        {{ attachmentsAt(i).at(j).get('prvFileName')?.value }}
+                      </small>
+                    </div>
+                  </div>
+                  @if(attachmentsAt(i).at(j).get('fileName')?.invalid &&
+                  attachmentsAt(i).at(j).get('fileName')?.touched)
+                  {
+                  <div class="text-danger small">
+                    File name is required.
+                  </div>
+                  }
                 </td>
-                <td><p-checkbox formControlName="isActive" [inputId]="'attActive' + i + '-' + j"></p-checkbox></td>
                 <td>
-                  <button type="button" pButton icon="pi pi-times" severity="danger" (click)="removeAttachment(i,j)"><i class="bi bi-trash"></i></button>
+                  @if(attachmentsAt(i).at(j)['previewUrl']){
+                  <img [src]="attachmentsAt(i).at(j)['previewUrl']"
+                    alt="preview" class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" />
+                  }
+                </td>
+                <td>
+                  <p-button type="button" severity="danger" styleClass="p-button-sm" (click)="removeAttachment(i,j)"><i
+                      class="bi bi-trash"></i></p-button>
                 </td>
               </tr>
             </ng-template>
           </p-table>
-        }
-          <button type="button" pButton icon="pi pi-plus" label="Add Attachment" (click)="addAttachment(i)" class="mt-2"></button>
-        </ng-container>
+          }
 
-        <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="removeItem(i)" class="mt-2"><i class="bi bi-trash"></i></button>
+        </ng-container>
+        <p-button type="button" label="Add Attachment" (click)="addAttachment(i)" styleClass="mt-2 p-button-sm"><i
+            class="bi bi-plus"></i></p-button>
+        <p-button type="button" severity="danger" (click)="removeItem(i)" styleClass="mt-2 ms-1 p-button-sm"><i
+            class="bi bi-trash"></i></p-button>
 
       </div>
+      }
     </ng-container>
 
-    <button type="button" pButton icon="pi pi-plus" label="Add Item" (click)="addItem()"></button>
+    <p-button type="button" label="Add Item" styleClass="p-button-sm" (click)="addItem()"><i
+        class="bi bi-plus"></i></p-button>
 
     <p-divider></p-divider>
 
-    <div class="flex justify-content-end gap-2 mt-2">
-      <button type="button" pButton label="Reset" class="p-button-secondary" (click)="resetForm()"></button>
-      <button type="submit" pButton label="Save" icon="pi pi-check"></button>
+    <div class="d-flex justify-content-end gap-2">
+      <p-button label="Reset" styleClass="p-button-sm" (click)="resetForm()" severity="warn"></p-button>
+      <p-button type="submit" label="Save"  icon="pi pi-check"
+        styleClass="p-button-sm"></p-button><!--[disabled]="form.invalid"-->
     </div>
 
   </form>

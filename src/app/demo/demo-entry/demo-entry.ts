@@ -1,17 +1,23 @@
 import { Component } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 // PrimeNG modules
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FileUploadModule, UploadEvent } from 'primeng/fileupload';
+import { FileUploadModule } from 'primeng/fileupload';
+
+// Services
+import { DemoDataService } from '../services/demo.data.service';
+import { InformationService } from '../../shared/services/information-service';
+import { EntityState } from '../../shared/models/javascriptMethods';
+import { ActivatedRoute } from '@angular/router';
+
 @Component({
   selector: 'app-demo-entry',
   standalone: true,
@@ -23,38 +29,78 @@ import { FileUploadModule, UploadEvent } from 'primeng/fileupload';
     InputTextModule,
     TextareaModule,
     DatePickerModule,
-    CheckboxModule,
     ButtonModule,
     DividerModule,
     CardModule,
     TableModule,
-    FileUploadModule
+    FileUploadModule,
   ],
 })
 export class DemoEntry {
   form: FormGroup;
+  id: number = 0;
+  constructor(
+    private fb: FormBuilder,
+    private dataSvc: DemoDataService,
+    private msgSvc: InformationService,
+    private route: ActivatedRoute
+  ) { }
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      id: 0,
-      name: [null, Validators.required],
-      createDate: null,
-      isActive: false,
-      demoItems: this.fb.array([]),
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.id = params['id'] || '';
+      if (this.id) {
+        this.getDemoById();
+
+      } else {
+        
+      }
     });
-
-    // Add one default item
-    this.addItem();
+    this.setFormData();
   }
 
+  setFormData() {
+    try {
+      this.form = this.fb.group({
+        id: 0,
+        name: [null, Validators.required],
+        createDate: null,
+        isActive: false,
+        demoItems: this.fb.array([]),
+      });
+
+      // Start with one default item
+      this.addItem();
+    } catch (err) {
+      this.msgSvc.showErrorMsg(err);
+    }
+  }
+
+  getDemoById() {
+    try {
+      this.dataSvc.getDemoById(this.id).subscribe({
+        next: (res) => {
+          this.loadDemoForEdit(res.data[0]);
+        }
+        , error: (err) => {
+          this.msgSvc.showErrorMsg(err);
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // FormArray getters
   get demoItems(): FormArray {
     return this.form.get('demoItems') as FormArray;
   }
 
-  attachmentsAt(i: number): FormArray {
-    return this.demoItems.at(i).get('demoItemFileAttachments') as FormArray;
+  attachmentsAt(itemIndex: number): FormArray {
+    return this.demoItems.at(itemIndex).get('demoItemFileAttachments') as FormArray;
   }
 
+  // Build new item
   private buildItem(): FormGroup {
     return this.fb.group({
       id: 0,
@@ -62,50 +108,179 @@ export class DemoEntry {
       title: null,
       description: null,
       isActive: false,
+      tag: EntityState.Added,
       demoItemFileAttachments: this.fb.array([]),
     });
   }
 
+  // Build new attachment
   private buildAttachment(): FormGroup {
     return this.fb.group({
       id: 0,
       fileName: [null, Validators.required],
+      prvFileName: null,
       folderNAme: null,
       isActive: false,
+      previewUrl: null,
+      selectedFile: null,
+      isDeleted: false,
+      tag: EntityState.Added,
     });
   }
 
+  // Add / Remove items
   addItem() {
     this.demoItems.push(this.buildItem());
   }
 
   removeItem(i: number) {
-    this.demoItems.removeAt(i);
+    if (this.demoItems.controls.length == 1) {
+      this.msgSvc.showWarningMsg("There must be atleast an item.");
+      return;
+    }
+    const item = this.demoItems.at(i);
+    if (item.value.id && item.value.id > 0) {
+      item.patchValue({ tag: EntityState.Deleted });
+    } else {
+      this.demoItems.removeAt(i);
+    }
   }
 
-  addAttachment(i: number) {
-    this.attachmentsAt(i).push(this.buildAttachment());
+  // Add / Remove attachments
+  addAttachment(itemIndex: number) {
+    this.attachmentsAt(itemIndex).push(this.buildAttachment());
   }
 
-  removeAttachment(i: number, j: number) {
-    this.attachmentsAt(i).removeAt(j);
+  removeAttachment(itemIndex: number, attIndex: number) {
+    const control = this.attachmentsAt(itemIndex).at(attIndex);
+    if (control.value.id && control.value.id > 0) {
+      control.patchValue({ tag: EntityState.Deleted, isDeleted: true });
+      control['selectedFile'] = null;
+      control['previewUrl'] = null;
+    } else {
+      this.attachmentsAt(itemIndex).removeAt(attIndex);
+    }
   }
 
+  // Track field changes for Modified
+  private markAsModified(control: AbstractControl) {
+    if (control instanceof FormGroup) {
+      Object.values(control.controls).forEach(ctrl => {
+        // Recursively mark child controls
+        this.markAsModified(ctrl);
+      });
+      control.patchValue({ tag: EntityState.Modified }, { emitEvent: false });
+    } else if (control instanceof FormArray) {
+      control.controls.forEach(ctrl => this.markAsModified(ctrl));
+    } else if (control instanceof FormControl) {
+      // just mark touched if needed
+      control.markAsTouched();
+    }
+  }
+
+
+  // File selection
+  onFileSelect(event: any, itemIndex: number, attIndex: number) {
+    const file = event.files?.[0];
+    if (!file) return;
+
+    const control = this.attachmentsAt(itemIndex).at(attIndex);
+    //unique file name
+    const fileName = itemIndex + '_' + attIndex + '_' + file.name;
+    // Update file info
+    control.get('fileName')?.setValue(fileName);
+    control.get('prvFileName')?.setValue(file.name);
+    control['selectedFile'] = file;
+
+    // Generate preview
+    const reader = new FileReader();
+    reader.onload = () => (control['previewUrl'] = reader.result as string);
+    reader.readAsDataURL(file);
+
+    // If this attachment exists in DB, mark as Modified
+    if (control.value.id && control.value.id > 0 && control.value.tag !== EntityState.Added) {
+      control.patchValue({ tag: EntityState.Modified }, { emitEvent: false });
+    }
+  }
+
+  // Load demo for editing
+  loadDemoForEdit(demo: any) {
+    this.form.patchValue({
+      id: demo.id,
+      name: demo.name,
+      createDate: demo.createDate,
+      isActive: demo.isActive,
+    });
+
+    this.demoItems.clear();
+
+    demo.demoItems.forEach((item: any) => {
+      const itemGroup = this.fb.group({
+        id: item.id,
+        name: [item.name, Validators.required],
+        title: item.title,
+        description: item.description,
+        isActive: item.isActive,
+        tag: EntityState.Unchanged,
+        demoItemFileAttachments: this.fb.array([]),
+      });
+
+      const attachmentsArray = itemGroup.get('demoItemFileAttachments') as FormArray;
+      item.demoItemFileAttachments.forEach((att: any) => {
+        attachmentsArray.push(this.fb.group({
+          id: att.id,
+          fileName: att.fileName,
+          previewUrl: `/uploads/${att.fileName}`, // optional preview
+          selectedFile: null,
+          isDeleted: false,
+          tag: EntityState.Unchanged,
+        }));
+      });
+
+      this.demoItems.push(itemGroup);
+    });
+  }
+
+  // Submit FormData
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    console.log('Form Submit:', this.form.getRawValue());
+
+    const formData = new FormData();
+    const data = this.form.value;
+
+    formData.append('demo', JSON.stringify(data));
+
+    // Only new/changed files
+    this.demoItems.controls.forEach((item, i) => {
+      const attachments = item.get('demoItemFileAttachments') as FormArray;
+      attachments.controls.forEach((att, j) => {
+        var file: File = att['selectedFile'];
+        //Set Same Unique Filename
+        const fileName = i + '_' + j + '_' + file.name;
+        if (file && att.value.tag !== EntityState.Deleted) {
+          formData.append(`files`, file, fileName);
+        }
+      });
+    });
+
+    this.dataSvc.save(formData).subscribe({
+      next: (res) => {
+        this.msgSvc.showSuccessMsg('Saved successfully');
+        // Load updated demo if backend returns updated data
+        //this.loadDemoForEdit(res);
+        this.resetForm();
+      },
+      error: (err) => this.msgSvc.showErrorMsg(err),
+    });
   }
 
+  // Reset form
   resetForm() {
-    this.form.reset({ isActive: false, demoItems: [] });
+    this.form.reset({ isActive: false });
     this.demoItems.clear();
-    this.addItem(); // add default item after reset
+    this.addItem();
   }
-   onUpload(event: UploadEvent) {
-    console.log(event)
-        //this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded with Basic Mode' });
-    }
 }

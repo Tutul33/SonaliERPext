@@ -1,0 +1,21 @@
+<h3>
+    Role List
+</h3>
+<p-table [value]="modelSvc.demoList" [tableStyle]="{ 'min-width': '50rem','border': '1px solid #e5e5e5' }">
+    <ng-template #header>
+        <tr>
+            <th>Name</th>
+            <th>Create Date</th>
+            <th>IsActive</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-item>
+        <tr>
+            <td>
+                <a href="javascript:void(0)" (click)="routesToPage(item.id)">{{ item.name }}</a>
+            </td>
+            <td>{{ item.createDate | date: 'yyyy-MM-dd'}}</td>
+            <td>{{ item.isActive|booleanToYesNo }}</td>
+        </tr>
+    </ng-template>
+</p-table>

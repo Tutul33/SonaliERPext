@@ -33,7 +33,10 @@ export class SidebartoggleDataService {
       label: 'Demo',
       route: '/app/demo',
       hasAccess: true,
-      children: [{ label: 'Demo Entry', hasAccess: true, route: '/app/demo/demo-entry' }]
+      children: [
+        { label: 'Demo Entry', hasAccess: true, route: '/app/demo/demo-entry' },
+        { label: 'Demo List', hasAccess: true, route: '/app/demo/demo-list' }
+      ]
     },
   ]);
 

@@ -1,5 +1,5 @@
 export class Demo {
-    id: number = 0;
+    id: number = null;
     name: string = null;
     isActive: boolean = false;
     createDate: Date = null;
@@ -14,14 +14,18 @@ export class Demo {
         });
     }
 }
+
 export class DemoItem {
-    id: number = 0;
-    demoId: number = 0;
+    id: number = null;
+    demoId: number = null;
     name: string = null;
     description: string = null;
     title: string = null;
     isActive: string = null;
     demoItemFileAttachments: DemoItemFileAttachment[]=[];
+
+    //extra
+    tag:number=0;
     constructor(defaultData?: Partial<DemoItem>) {
         defaultData = defaultData || {};
         Object.keys(defaultData).forEach((key) => {
@@ -34,11 +38,17 @@ export class DemoItem {
 }
 
 export class DemoItemFileAttachment {
-    id: number = 0;
-    demoItemId: number = 0;
+    id: number = null;
+    demoItemId: number = null;
     fileName: string = null;
+    prvFileName: string = null;
     folderNAme: string = null;
     isActive: boolean = false;
+
+    //Extra
+    tag:number=0;
+    previewUrl:any;
+    selectedFile:any;
     constructor(defaultData?: Partial<DemoItemFileAttachment>) {
         defaultData = defaultData || {};
         Object.keys(defaultData).forEach((key) => {
