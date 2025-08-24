@@ -12,6 +12,10 @@ export class GlobalMethods {
     return GlobalMethods.isProduction ? 'http://localhost:8081/api/' : 'http://localhost:5020/api/';
   }
 
+  static FileUrl() {
+    return GlobalMethods.isProduction ? 'http://localhost:8081/uploads/' : 'http://localhost:5020/uploads/';
+  }
+
   static deepClone<T>(value: T): T {
     return clone<T>(value);
   }
@@ -61,6 +65,11 @@ export class GlobalMethods {
       return error as any;
     }
   }
+
+  static fileFolders = {
+    'demo': "demo",
+  }
+
 
 }
 

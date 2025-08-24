@@ -47,8 +47,8 @@
                 <th>Action</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-att let-j="rowIndex">
-              <tr [formGroupName]="j">
+            <ng-template pTemplate="body" let-att let-j="rowIndex" >
+              <tr [formGroupName]="j" *ngIf="attachmentsAt(i).at(j).get('tag').value!==EntityState.Deleted">
                 <td>
                   <div class="d-flex justify-content-start">
                     <p-fileupload #fu mode="basic" chooseLabel="Choose" chooseIcon="pi pi-upload" name="demo[]"
@@ -68,10 +68,17 @@
                   </div>
                   }
                 </td>
-                <td>
-                  @if(attachmentsAt(i).at(j)['previewUrl']){
-                  <img [src]="attachmentsAt(i).at(j)['previewUrl']"
-                    alt="preview" class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" />
+                <td>                  
+                  @if(attachmentsAt(i).at(j).get('id')?.value>0 && attachmentsAt(i).at(j).get('tag')?.value==EntityState.Unchanged)
+                  {
+                    <img [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="preview" class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" />
+                     
+                  }
+                  @else{
+                     @if(attachmentsAt(i).at(j)['previewUrl']){
+                     <img [src]="attachmentsAt(i).at(j)['previewUrl']"
+                       alt="preview" class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" />
+                     }
                   }
                 </td>
                 <td>
@@ -99,6 +106,7 @@
     <p-divider></p-divider>
 
     <div class="d-flex justify-content-end gap-2">
+      <p-button label="Clear" styleClass="p-button-sm" (click)="clearForm()" severity="danger"></p-button>
       <p-button label="Reset" styleClass="p-button-sm" (click)="resetForm()" severity="warn"></p-button>
       <p-button type="submit" label="Save"  icon="pi pi-check"
         styleClass="p-button-sm"></p-button><!--[disabled]="form.invalid"-->
