@@ -73,7 +73,7 @@ export class GlobalMethods {
   static reportRenderingType = {
     'Excel': 'Excel',
     'PDF': 'PDF',
-    'DOC': 'DOC',
+    'word': 'word',
     'Image':'Image'
   };
 

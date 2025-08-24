@@ -30,7 +30,7 @@ export class ReportDataService {
             case GlobalMethods.reportRenderingType.Excel:
               extension = "xlsx";
               break;
-            case GlobalMethods.reportRenderingType.DOC:
+            case GlobalMethods.reportRenderingType.word:
               extension = "docx";
               break;
             case GlobalMethods.reportRenderingType.Image:

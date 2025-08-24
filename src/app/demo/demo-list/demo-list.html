@@ -18,8 +18,10 @@
             <td>{{ item.createDate | date: 'yyyy-MM-dd'}}</td>
             <td>{{ item.isActive|booleanToYesNo }}</td>
             <td>
-                <a href="javascript:void(0)" (click)="print(item)" class="text-success"><i class="bi bi-printer-fill"></i></a>
-                <a href="javascript:void(0)" (click)="delete(item)" class="text-danger" class="ms-2"><i class="bi bi-trash"></i></a>
+                <a href="javascript:void(0)" (click)="print(item,reportRenderingType.PDF)" class="text-success"><i class="bi bi-printer-fill"></i></a>
+                <a href="javascript:void(0)" (click)="print(item,reportRenderingType.Excel)" class="text-success ms-2"><i class="bi bi-file-excel"></i></a>
+                <a href="javascript:void(0)" (click)="print(item,reportRenderingType.word)" class="text-success ms-2"><i class="bi bi-file-text"></i></a>
+                <a href="javascript:void(0)" (click)="delete(item)" class="text-danger ms-2" ><i class="bi bi-trash"></i></a>
             </td>
         </tr>
     </ng-template>

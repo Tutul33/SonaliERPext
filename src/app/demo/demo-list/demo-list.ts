@@ -18,6 +18,7 @@ import { ReportDataService } from '../../shared/services/report-data-service';
   styleUrl: './demo-list.css'
 })
 export class DemoList {
+  reportRenderingType:any=GlobalMethods.reportRenderingType;
   constructor(
     private dataSvc: DemoDataService, 
     public modelSvc: DemoModelService, 
@@ -80,11 +81,11 @@ export class DemoList {
     }
   }
 
-  print(data) {
+  print(data,type) {
     try {
       this.dataSvc.getDemoById(data.id).subscribe({
         next: (res: any) => {
-          let reportData = this.prepareVoucherOption(res.data);
+          let reportData = this.prepareVoucherOption(res.data,type);
           this.reportSvc.printReport(reportData);
         },
         error: (res: any) => {
@@ -95,14 +96,14 @@ export class DemoList {
       throw e;
     }
   }
-  private prepareVoucherOption(data: any[]) {
+  private prepareVoucherOption(data: any[],type) {
     try {
       let title = null;
       if (data.length > 0) title = data[0].title;
       
       return {
         reportName: 'Sample.rdlc',
-        reportType: GlobalMethods.reportRenderingType.Excel,
+        reportType: type,
         userID: 1,
         data: this.modelSvc.prepareDateForPrint(data),
         params: this.getRptParameter(title),
