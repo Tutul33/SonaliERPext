@@ -24,16 +24,16 @@ export class ReportDataService {
           let extension;
 
           switch (reportData.reportType) {
-            case "pdf":
+            case GlobalMethods.reportRenderingType.PDF:
               extension = "pdf";
               break;
-            case "excel":
+            case GlobalMethods.reportRenderingType.Excel:
               extension = "xlsx";
               break;
-            case "word":
+            case GlobalMethods.reportRenderingType.DOC:
               extension = "docx";
               break;
-            case "image":
+            case GlobalMethods.reportRenderingType.Image:
               extension = "png";
               break;
             default:
