@@ -16,6 +16,10 @@ export class GlobalMethods {
     return GlobalMethods.isProduction ? 'http://localhost:8081/uploads/' : 'http://localhost:5020/uploads/';
   }
 
+  static ApiHost() {
+    return GlobalMethods.isProduction ? 'http://localhost:8081/' : 'http://localhost:5020/';
+  }
+
   static deepClone<T>(value: T): T {
     return clone<T>(value);
   }
@@ -66,11 +70,18 @@ export class GlobalMethods {
     }
   }
 
+  static reportRenderingType = {
+    'Excel': 'Excel',
+    'PDF': 'PDF',
+    'DOC': 'DOC',
+    'Image':'Image'
+  };
+
   static fileFolders = {
     'demo': "demo",
   }
 
-
+  
 }
 
 export const EntityState = {

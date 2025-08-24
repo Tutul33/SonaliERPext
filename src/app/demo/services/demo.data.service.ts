@@ -27,4 +27,12 @@ export class DemoDataService {
          this.url + `getDemoById?id=` + id
       );
    }
+
+  delete(id: number): Observable<any> {   
+      return this.http.delete<any>(
+         this.url + `delete?id=` + id
+      );
+   }
+
+  
 }

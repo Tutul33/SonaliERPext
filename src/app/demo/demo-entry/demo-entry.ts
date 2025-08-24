@@ -17,6 +17,7 @@ import { DemoDataService } from '../services/demo.data.service';
 import { InformationService } from '../../shared/services/information-service';
 import { EntityState, GlobalMethods } from '../../shared/models/javascriptMethods';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingService } from '../../shared/services/loading-service';
 
 @Component({
   selector: 'app-demo-entry',
@@ -39,17 +40,19 @@ import { ActivatedRoute } from '@angular/router';
 export class DemoEntry {
   form: FormGroup;
   id: number = 0;
-  fileUrl:any=GlobalMethods.FileUrl();
-  EntityState:any=EntityState;
+  fileUrl: any = GlobalMethods.FileUrl();
+  EntityState: any = EntityState;
+  tempData:any;
   constructor(
     private fb: FormBuilder,
     private dataSvc: DemoDataService,
     private msgSvc: InformationService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit() {
-    
+
     this.setFormData();
     this.route.queryParams.subscribe(params => {
       this.id = params['id'] || '';
@@ -57,8 +60,8 @@ export class DemoEntry {
         this.getDemoById();
 
       } else {
-         // Start with one default item
-      this.addItem();
+        // Start with one default item
+        this.addItem();
       }
     });
   }
@@ -73,7 +76,7 @@ export class DemoEntry {
         demoItems: this.fb.array([]),
       });
 
-     
+
     } catch (err) {
       this.msgSvc.showErrorMsg(err);
     }
@@ -83,6 +86,7 @@ export class DemoEntry {
     try {
       this.dataSvc.getDemoById(this.id).subscribe({
         next: (res) => {
+          this.tempData=res.data[0];
           this.loadDemoForEdit(res.data[0]);
         }
         , error: (err) => {
@@ -107,7 +111,7 @@ export class DemoEntry {
   private buildItem(): FormGroup {
     return this.fb.group({
       id: 0,
-      demoId:0,
+      demoId: 0,
       name: [null, Validators.required],
       title: null,
       description: null,
@@ -121,9 +125,9 @@ export class DemoEntry {
   private buildAttachment(): FormGroup {
     return this.fb.group({
       id: 0,
-      demoItemId:0,
+      demoItemId: 0,
       fileName: [null, Validators.required],
-      filePath:null,
+      filePath: null,
       prvFileName: null,
       folderNAme: null,
       isActive: false,
@@ -214,7 +218,7 @@ export class DemoEntry {
     this.form.patchValue({
       id: demo.id,
       name: demo.name,
-      createDate: demo.createDate?new Date(demo.createDate):null,
+      createDate: demo.createDate ? new Date(demo.createDate) : null,
       isActive: demo.isActive,
     });
 
@@ -223,7 +227,7 @@ export class DemoEntry {
     demo.demoItems.forEach((item: any) => {
       const itemGroup = this.fb.group({
         id: item.id,
-        demoId:item.demoId,
+        demoId: item.demoId,
         name: [item.name, Validators.required],
         title: item.title,
         description: item.description,
@@ -234,14 +238,12 @@ export class DemoEntry {
 
       const attachmentsArray = itemGroup.get('demoItemFileAttachments') as FormArray;
       item.demoItemFileAttachments.forEach((att: any) => {
-        debugger
-        var filePath=GlobalMethods.fileFolders.demo+"/"+demo.id+"/"+att.fileName;
         attachmentsArray.push(this.fb.group({
           id: att.id,
-          demoItemId:att.demoItemId,
+          demoItemId: att.demoItemId,
           fileName: att.fileName,
-          filePath:GlobalMethods.fileFolders.demo+"/"+demo.id+"/"+att.fileName,
-          prvFileName:att.fileName,
+          filePath: GlobalMethods.fileFolders.demo + "/" + demo.id + "/" + att.fileName,
+          prvFileName: att.fileName,
           previewUrl: `/uploads/${att.fileName}`, // optional preview
           selectedFile: null,
           isDeleted: false,
@@ -259,50 +261,62 @@ export class DemoEntry {
       this.form.markAllAsTouched();
       return;
     }
-
+    this.loadingService.show();
     const formData = new FormData();
-    
-
-    
-
-    // Only new/changed files
     this.demoItems.controls.forEach((item, i) => {
-      if(item.get('id').value>0)
-         item.patchValue({ tag: EntityState.Modified });
+      if (item.get('id').value > 0)
+        item.patchValue({ tag: EntityState.Modified });
       const attachments = item.get('demoItemFileAttachments') as FormArray;
       attachments.controls.forEach((att, j) => {
         var file: File = att['selectedFile'];
-        //Set Same Unique Filename
-        
         if (file && att.value.tag !== EntityState.Deleted) {
+          //Set Unique FileName
           const fileName = i + '_' + j + '_' + file.name;
-          formData.append(`files`, file, fileName);          
+          formData.append(`files`, file, fileName);
         }
       });
     });
     const data = this.form.value;
     formData.append('demo', JSON.stringify(data));
     this.dataSvc.save(formData).subscribe({
-      next: (res) => {
+      next: (res) => {        
+        this.loadingService.hide();
         this.msgSvc.showSuccessMsg('Saved successfully');
+        debugger;
         // Load updated demo if backend returns updated data
-        //this.loadDemoForEdit(res);
-        this.resetForm();
+        this.loadDemoForEdit(res.data);
+        //this.resetForm();
       },
-      error: (err) => this.msgSvc.showErrorMsg(err),
+      error: (err) => {
+        this.msgSvc.showErrorMsg(err);
+        this.loadingService.hide();
+      },
     });
   }
 
   // Reset form
   resetForm() {
-    this.form.reset({ isActive: false });
-    this.demoItems.clear();
-    this.addItem();
+    try {
+      if (this.id) {
+         this.loadDemoForEdit(this.tempData);
+      }
+      else {
+        this.form.reset({ isActive: false });
+        this.demoItems.clear();
+        this.addItem();
+      }
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
   }
 
   clearForm() {
-    this.form.reset({ isActive: false });
-    this.demoItems.clear();
-    this.addItem();
+    try {
+      this.form.reset({ isActive: false });
+      this.demoItems.clear();
+      this.addItem();
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
+    }
   }
 }

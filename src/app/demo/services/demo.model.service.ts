@@ -6,24 +6,24 @@ import { Demo, DemoItem, DemoItemFileAttachment } from '../models/demo-model';
 })
 export class DemoModelService {
 
-  demoList:any[]=[];
+  demoList: any[] = [];
 
-  prepareDemoList(data){
+  prepareDemoList(data) {
     try {
-      this.demoList=data;
+      this.demoList = data;
     } catch (error) {
       throw error;
     }
   }
 
-  prepareDataBeforeSave(data){
+  prepareDataBeforeSave(data) {
     try {
-      let demoObj=new Demo(data);
-      demoObj.demoItems.forEach((item)=>{
-        item=new DemoItem(item);
+      let demoObj = new Demo(data);
+      demoObj.demoItems.forEach((item) => {
+        item = new DemoItem(item);
         item.setInsertTag();
-        item.demoItemFileAttachments.forEach((attachment)=>{
-          attachment=new DemoItemFileAttachment(attachment);
+        item.demoItemFileAttachments.forEach((attachment) => {
+          attachment = new DemoItemFileAttachment(attachment);
           attachment.setInsertTag();
         });
       })
@@ -33,5 +33,20 @@ export class DemoModelService {
     }
   }
 
-  
+  prepareDataOnDelete(data) {
+    try {
+      this.demoList = this.demoList.filter(x => x.id != data.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  prepareDateForPrint(data) {
+    try {
+      return data.map(item => ({ id: item.id, name: item.name }));
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
