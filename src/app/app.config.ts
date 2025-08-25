@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
@@ -12,7 +12,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 
 // NgRx imports
 import { provideStore } from '@ngrx/store';
-import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './shared/store/auth.reducer';
 
 import "../app/shared/models/extensions";
@@ -20,7 +19,7 @@ import "../app/shared/models/extensions";
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: 'reload' })
@@ -37,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     MessageService,
 
-    // ✅ NgRx setup
+    //NgRx setup
     provideStore({ auth: authReducer })
   ]
 };

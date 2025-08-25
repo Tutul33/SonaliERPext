@@ -1,21 +1,20 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class PdfViewerService {
   // PDF source (URL or Blob URL)
-  pdfSrc$ = new BehaviorSubject<string | null>(null);
+  pdfSrc = signal<string | null>(null);
+
   // Controls dialog visibility
-  visible$ = new BehaviorSubject<boolean>(false);
+  visible = signal<boolean>(false);
 
   open(src: string) {
-    this.pdfSrc$.next(src);
-    this.visible$.next(true);
+    this.pdfSrc.set(src);
+    this.visible.set(true);
   }
 
   close() {
-    this.visible$.next(false);
-    this.pdfSrc$.next(null);
+    this.visible.set(false);
+    this.pdfSrc.set(null);
   }
 }
-
