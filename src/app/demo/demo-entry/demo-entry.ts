@@ -71,7 +71,7 @@ export class DemoEntry {
       this.form = this.fb.group({
         id: 0,
         name: [null, Validators.required],
-        createDate: null,
+        createDate: [null, Validators.required],
         isActive: false,
         demoItems: this.fb.array([]),
       });
@@ -102,7 +102,7 @@ export class DemoEntry {
   get demoItems(): FormArray {
     return this.form.get('demoItems') as FormArray;
   }
-
+  
   attachmentsAt(itemIndex: number): FormArray {
     return this.demoItems.at(itemIndex).get('demoItemFileAttachments') as FormArray;
   }
