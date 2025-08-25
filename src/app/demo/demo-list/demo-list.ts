@@ -86,7 +86,7 @@ export class DemoList {
       this.dataSvc.getDemoById(data.id).subscribe({
         next: (res: any) => {
           let reportData = this.prepareVoucherOption(res.data,type);
-          this.reportSvc.printReport(reportData,true);
+          this.reportSvc.printReport(reportData,false);
         },
         error: (res: any) => {
           throw res;

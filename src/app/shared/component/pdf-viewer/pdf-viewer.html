@@ -1,0 +1,23 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '80vw' }"
+  [contentStyle]="{ height: '80vh' }"
+  (onHide)="onDialogHide()"
+  [closable]="true"
+>
+  <ng-template pTemplate="header">
+    PDF Preview
+  </ng-template>
+
+  <ngx-extended-pdf-viewer
+  *ngIf="pdfSrc"
+  [src]="pdfSrc"
+  [height]="'100%'"
+  [showDownloadButton]="true"
+  [showPrintButton]="true"
+  [showSidebarButton]="true"
+  [textLayer]="true"
+></ngx-extended-pdf-viewer>
+
+</p-dialog>

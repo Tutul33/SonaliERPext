@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { GlobalMethods } from '../models/javascriptMethods';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { PdfViewerService } from './pdf.viewer.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportDataService {
-
+  private pdfService = inject(PdfViewerService);
   reportUrl: string = GlobalMethods.ApiUrl() + 'Reports/';
   constructor(private http: HttpClient) {
 
@@ -16,7 +17,7 @@ export class ReportDataService {
   getReport(entity: any): Observable<any> {
     return this.http.post(this.reportUrl + 'ShowReports', entity);
   }
-  printReport(reportData: any,isDownload:boolean) {
+  printReport(reportData: any, isDownload: boolean) {
     try {
       this.getReport(reportData).subscribe({
         next: async (res: any) => {
@@ -39,11 +40,12 @@ export class ReportDataService {
             default:
               extension = "";
           }
-          if (extension=="pdf" && !isDownload) {
-            const url = GlobalMethods.ApiHost() + "reports/" + extension + "/" + fileName;
-            window.open(url, '_blank');
-          }else{
-            this.download(extension,fileName);
+
+          if (extension == "pdf" && !isDownload) {
+            //this.openInBrowser(extension,fileName);
+            this.pdfView(extension, fileName)
+          } else {
+            this.download(extension, fileName);
           }
         },
         error: (res: any) => { },
@@ -52,20 +54,59 @@ export class ReportDataService {
       throw e;
     }
   }
-  downloadReport(fileType:string,fileName: string) {
-    return this.http.get(`${this.reportUrl}download/${fileType}/${fileName}`, {
-      responseType: 'blob'
-    });
+  downloadReport(fileType: string, fileName: string) {
+    try {
+      return this.http.get(`${this.reportUrl}download/${fileType}/${fileName}`, {
+        responseType: 'blob'
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
-  download(fileType:string,fileName: string) {
-    this.downloadReport(fileType,fileName).subscribe(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
+  download(fileType: string, fileName: string) {
+    try {
+      this.downloadReport(fileType, fileName).subscribe(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  pdfView(fileType: string, fileName: string) {
+    try {
+      this.downloadReport(fileType, fileName).subscribe({
+        next: (blob: Blob) => {
+          // Ensure blob type is correct
+          const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+
+          // Create a blob URL
+          const blobUrl = URL.createObjectURL(pdfBlob);
+
+          // Open in the global PDF viewer
+          this.pdfService.open(blobUrl);
+        },
+        error: (err) => {
+          console.error('Error fetching PDF', err);
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  openInBrowser(extension, fileName) {
+    try {
+      const url = GlobalMethods.ApiHost() + "reports/" + extension + "/" + fileName;
+      window.open(url, '_blank');
+    } catch (error) {
+      throw error;
+    }
   }
 }
