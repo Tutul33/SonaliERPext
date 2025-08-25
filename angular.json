@@ -27,6 +27,11 @@
                 "glob": "**/*",
                 "input": "node_modules/bootstrap-icons/font/fonts",
                 "output": "fonts"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets",
+                "output": "/assets/"
               }
             ],
             "styles": [
