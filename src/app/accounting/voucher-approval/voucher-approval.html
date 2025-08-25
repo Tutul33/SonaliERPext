@@ -231,16 +231,19 @@
 
             </div>
           </th>
+            @if(modelSvc.status=='referral-pending'){
           <th style="width:5%">
             <div class="flex items-center gap-2">
               Edit
             </div>
-          </th>
+          </th>}
         </tr>
       </ng-template>
       <ng-template #body let-voucherItem>
         @if(voucherItem.tag!=2) {
-        <tr>
+          @if(modelSvc.status=='referral-pending')
+          {
+         <tr >
           <td>
             <div class="d-flex gap-3 align-items-start">
               <div class="flex-grow-1">
@@ -278,7 +281,46 @@
                 class="bi bi-trash"></i></p-button>
             }
           </td>
-        </tr>
+         </tr>
+        }
+        @else {
+          <tr >
+          <td>
+            <div class="d-flex gap-3 align-items-start">
+              <div class="flex-grow-1">
+                <p-treeSelect #tree [(ngModel)]="voucherItem.node" [options]="voucherItem.chartOfAccountList" [disabled]="true"
+                  name="chartOfAccounts" placeholder="Select Ledger" optionLabel="label" optionValue="id"
+                  [filter]="true" filterMode="strict" filterPlaceholder="Strict Filter" selectionMode="single"
+                  [style]="{ width: '100%' }" (onNodeSelect)="getLedgerOnSelect(voucherItem)" appendTo="body">
+                </p-treeSelect>
+              </div>
+              <div style="min-width: 220px;">
+                <p-select [options]="voucherItem.subLedgerList" [(ngModel)]="voucherItem.subLedgerNode" [disabled]="true"
+                  optionLabel="label" optionValue="key" [filter]="true" filterBy="label" [showClear]="true"
+                  placeholder="Select Sub Ledger" class="w-full md:w-56" (onChange)="onSubLedgerOnSelect(voucherItem)"
+                  appendTo="body">
+                  <ng-template #selectedItem let-selectedOption>
+                    <div class="flex items-center gap-2">
+                      <div>{{ selectedOption.label }}</div>
+                    </div>
+                  </ng-template>
+                  <ng-template let-coa #item>
+                    <div class="flex items-center gap-2">
+                      <div>{{ coa.label }}</div>
+                    </div>
+                  </ng-template>
+                </p-select>
+              </div>
+            </div>
+          </td>
+          <td><label>{{voucherItem.dAmount}}</label></td>
+          <td><label>{{voucherItem.cAmount}}</label></td>
+          <td>
+              <label>{{voucherItem.descrp}}</label>
+          </td>
+          
+         </tr>
+        }
         }
       </ng-template>
     </p-table>
