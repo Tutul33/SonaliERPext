@@ -43,7 +43,7 @@ export class DemoEntry {
   id: number = 0;
   fileUrl: any = GlobalMethods.FileUrl();
   EntityState: any = EntityState;
-  tempData:any;
+  tempData: any;
   constructor(
     private fb: FormBuilder,
     private dataSvc: DemoDataService,
@@ -87,7 +87,7 @@ export class DemoEntry {
     try {
       this.dataSvc.getDemoById(this.id).subscribe({
         next: (res) => {
-          this.tempData=res.data[0];
+          this.tempData = res.data[0];
           this.loadDemoForEdit(res.data[0]);
         }
         , error: (err) => {
@@ -103,7 +103,7 @@ export class DemoEntry {
   get demoItems(): FormArray {
     return this.form.get('demoItems') as FormArray;
   }
-  
+
   attachmentsAt(itemIndex: number): FormArray {
     return this.demoItems.at(itemIndex).get('demoItemFileAttachments') as FormArray;
   }
@@ -265,22 +265,28 @@ export class DemoEntry {
     this.loadingService.show();
     const formData = new FormData();
     this.demoItems.controls.forEach((item, i) => {
-      if (item.get('id').value > 0)
-        item.patchValue({ tag: EntityState.Modified });
+      if (item.get('id').value > 0) {
+        if (item.get('tag').value != EntityState.Deleted)
+          item.patchValue({ tag: EntityState.Modified });
+      }
       const attachments = item.get('demoItemFileAttachments') as FormArray;
       attachments.controls.forEach((att, j) => {
-        var file: File = att['selectedFile'];
-        if (file && att.value.tag !== EntityState.Deleted) {
-          //Set Unique FileName
-          const fileName = i + '_' + j + '_' + file.name;
-          formData.append(`files`, file, fileName);
+        if (item.get('tag').value != EntityState.Deleted) {
+          att.patchValue({ tag: EntityState.Deleted });
+        } else {
+          var file: File = att['selectedFile'];
+          if (file && att.value.tag !== EntityState.Deleted) {
+            //Set Unique FileName
+            const fileName = i + '_' + j + '_' + file.name;
+            formData.append(`files`, file, fileName);
+          }
         }
       });
     });
     const data = this.form.value;
     formData.append('demo', JSON.stringify(data));
     this.dataSvc.save(formData).subscribe({
-      next: (res) => {        
+      next: (res) => {
         this.loadingService.hide();
         this.msgSvc.showSuccessMsg('Saved successfully');
         // Load updated demo if backend returns updated data
@@ -298,7 +304,7 @@ export class DemoEntry {
   resetForm() {
     try {
       if (this.id) {
-         this.loadDemoForEdit(this.tempData);
+        this.loadDemoForEdit(this.tempData);
       }
       else {
         this.form.reset({ isActive: false });

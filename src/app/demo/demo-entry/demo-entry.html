@@ -7,19 +7,19 @@
         <label>Name</label><br>
         <input pInputText formControlName="name" class="w-100" />
         @if (form.get('name')?.invalid && form.get('name')?.touched) {
-          <div class="text-danger">
-            Name is required
-          </div>
-          }
+        <div class="text-danger">
+          Name is required
+        </div>
+        }
       </div>
       <div class="col-md-3">
         <label>Date</label><br>
         <p-datepicker formControlName="createDate" dateFormat="yy-mm-dd" [showIcon]="true" class="w-100"></p-datepicker>
         @if (form.get('createDate')?.invalid && form.get('createDate')?.touched) {
-          <div class="text-danger">
-            Date is required
-          </div>
-          }
+        <div class="text-danger">
+          Date is required
+        </div>
+        }
       </div>
 
     </div>
@@ -29,17 +29,18 @@
     <!-- Items -->
     <ng-container formArrayName="demoItems">
       @for (item of demoItems.controls; track i; let i = $index) {
+      @if(item.get('tag').value!=2){
       <div [formGroupName]="i" class="mb-3 p-3 border-1 surface-border rounded" style="border: 1px black dashed;">
 
         <div class="row">
           <div class="col-md-4">
             <label>Name</label><br>
             <input pInputText formControlName="name" class="w-100" />
-             @if (item.get('name')?.invalid && item.get('name')?.touched) {
-          <div class="text-danger">
-            Name is required
-          </div>
-          }
+            @if (item.get('name')?.invalid && item.get('name')?.touched) {
+            <div class="text-danger">
+              Name is required
+            </div>
+            }
           </div>
           <div class="col-md-4">
             <label>Title</label><br>
@@ -89,7 +90,8 @@
                   {
                   <!-- <img [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="preview"
                     class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" /> -->
-                  <p-image [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="Image" width="40px" height="40px" [preview]="true" />
+                  <p-image [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="Image" width="40px"
+                    height="40px" [preview]="true" />
                   }
                   @else{
                   @if(attachmentsAt(i).at(j)['previewUrl']){
@@ -109,15 +111,19 @@
 
         </ng-container>
         <div class="d-flex justify-content-between">
-          <p-button type="button" label="Add File" (click)="addAttachment(i)" styleClass="mt-2 p-button-sm"><i class="bi bi-paperclip"></i></p-button>
-          <p-button type="button" severity="danger" (click)="removeItem(i)" styleClass="mt-2 ms-1 p-button-sm "><i class="bi bi-trash"></i></p-button>
+          <p-button type="button" label="Add File" (click)="addAttachment(i)" styleClass="mt-2 p-button-sm"><i
+              class="bi bi-paperclip"></i></p-button>
+          <p-button type="button" severity="danger" (click)="removeItem(i)" styleClass="mt-2 ms-1 p-button-sm "><i
+              class="bi bi-trash"></i></p-button>
         </div>
 
       </div>
       }
+      }
     </ng-container>
 
-    <p-button type="button" label="Add Item" styleClass="p-button-sm" (click)="addItem()"><i class="bi bi-bag"></i></p-button>
+    <p-button type="button" label="Add Item" styleClass="p-button-sm" (click)="addItem()"><i
+        class="bi bi-bag"></i></p-button>
 
     <p-divider></p-divider>
 
