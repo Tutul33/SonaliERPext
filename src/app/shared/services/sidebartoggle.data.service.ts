@@ -10,36 +10,64 @@ export class SidebartoggleDataService {
   public isCollapsed$: Observable<boolean> = this.isCollapsedSubject.asObservable();
 
   // Add menuItems as BehaviorSubject
-  public menuItemsSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([
+  // public menuItemsSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([
+  //   {
+  //     label: 'Dashboard',
+  //     route: '/app/dashboard',
+  //     hasAccess: true,
+  //     children: [{ label: 'Home', hasAccess: true, route: '/app/dashboard/home' }]
+  //   },
+  //   {
+  //     label: 'Users',
+  //     route: '/app/admin',
+  //     hasAccess: false,
+  //     children: [
+  //       { label: 'User Role Map', hasAccess: false, route: '/app/admin/user-role-map' },
+  //       { label: 'User Role', hasAccess: false, route: '/app/admin/user-role' }
+  //     ]
+  //   },
+  //   { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
+  //   { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
+  //   { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
+  //   {
+  //     label: 'Demo',
+  //     route: '/app/demo',
+  //     hasAccess: true,
+  //     children: [
+  //       { label: 'Demo Entry', hasAccess: true, route: '/app/demo/demo-entry' },
+  //       { label: 'Demo List', hasAccess: true, route: '/app/demo/demo-list' }
+  //     ]
+  //   },
+  // ]);
+public menuItemsSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([
     {
       label: 'Dashboard',
-      route: '/app/dashboard',
+      route: '/dashboard',
       hasAccess: true,
-      children: [{ label: 'Home', hasAccess: true, route: '/app/dashboard/home' }]
+      children: [{ label: 'Home', hasAccess: true, route: '/dashboard/home' }]
     },
     {
       label: 'Users',
-      route: '/app/admin',
+      route: '/admin',
       hasAccess: false,
       children: [
-        { label: 'User Role Map', hasAccess: false, route: '/app/admin/user-role-map' },
-        { label: 'User Role', hasAccess: false, route: '/app/admin/user-role' }
+        { label: 'User Role Map', hasAccess: false, route: '/admin/user-role-map' },
+        { label: 'User Role', hasAccess: false, route: '/admin/user-role' }
       ]
     },
-    { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
-    { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
-    { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
+    { label: 'Check Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
+    { label: 'Approval Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
+    { label: 'Referral Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
     {
       label: 'Demo',
-      route: '/app/demo',
+      route: '/demo',
       hasAccess: true,
       children: [
-        { label: 'Demo Entry', hasAccess: true, route: '/app/demo/demo-entry' },
-        { label: 'Demo List', hasAccess: true, route: '/app/demo/demo-list' }
+        { label: 'Demo Entry', hasAccess: true, route: '/demo/demo-entry' },
+        { label: 'Demo List', hasAccess: true, route: '/demo/demo-list' }
       ]
     },
   ]);
-
   public menuItems$: Observable<any[]> = this.menuItemsSubject.asObservable();
 
   constructor() {

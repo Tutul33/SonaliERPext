@@ -7,7 +7,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
   {
-    path: 'app',
+    path: '',
     component: Default,
     canActivate: [authGuard],
     children: [

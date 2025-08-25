@@ -242,7 +242,7 @@ export class DemoEntry {
           id: att.id,
           demoItemId: att.demoItemId,
           fileName: att.fileName,
-          filePath: GlobalMethods.fileFolders.demo + "/" + demo.id + "/" + att.fileName,
+          filePath: GlobalMethods.fileFolders.demo + "/" + item.id + "/" + att.fileName,
           prvFileName: att.fileName,
           previewUrl: `/uploads/${att.fileName}`, // optional preview
           selectedFile: null,
@@ -282,7 +282,6 @@ export class DemoEntry {
       next: (res) => {        
         this.loadingService.hide();
         this.msgSvc.showSuccessMsg('Saved successfully');
-        debugger;
         // Load updated demo if backend returns updated data
         this.loadDemoForEdit(res.data);
         //this.resetForm();

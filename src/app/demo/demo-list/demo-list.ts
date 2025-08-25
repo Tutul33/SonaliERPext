@@ -51,7 +51,7 @@ export class DemoList {
 
   routesToPage(id: number) {
     try {
-      this.router.navigate(['/app/demo/demo-entry'], {
+      this.router.navigate(['/demo/demo-entry'], {
         queryParams: { id: id }
       });
     } catch (error) {
@@ -86,7 +86,7 @@ export class DemoList {
       this.dataSvc.getDemoById(data.id).subscribe({
         next: (res: any) => {
           let reportData = this.prepareVoucherOption(res.data,type);
-          this.reportSvc.printReport(reportData);
+          this.reportSvc.printReport(reportData,true);
         },
         error: (res: any) => {
           throw res;
@@ -102,12 +102,11 @@ export class DemoList {
       if (data.length > 0) title = data[0].title;
       
       return {
-        reportName: 'Sample.rdlc',
+        reportName: 'Sample',
         reportType: type,
         userID: 1,
         data: this.modelSvc.prepareDateForPrint(data),
         params: this.getRptParameter(title),
-        //dataColumns: this.getVoucherColumnHeader(),
         dataSetName: "Sp_DataPrint",
       };
     } catch (e) {

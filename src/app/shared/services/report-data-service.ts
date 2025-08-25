@@ -16,11 +16,11 @@ export class ReportDataService {
   getReport(entity: any): Observable<any> {
     return this.http.post(this.reportUrl + 'ShowReports', entity);
   }
-  printReport(reportData: any) {
+  printReport(reportData: any,isDownload:boolean) {
     try {
       this.getReport(reportData).subscribe({
         next: async (res: any) => {
-          let pdfName = res.data.fileName;
+          let fileName = res.data.fileName;
           let extension;
 
           switch (reportData.reportType) {
@@ -39,9 +39,11 @@ export class ReportDataService {
             default:
               extension = "";
           }
-          if (extension) {
-            const url = GlobalMethods.ApiHost() + "reports/" + extension + "/" + pdfName;
+          if (extension=="pdf" && !isDownload) {
+            const url = GlobalMethods.ApiHost() + "reports/" + extension + "/" + fileName;
             window.open(url, '_blank');
+          }else{
+            this.download(extension,fileName);
           }
         },
         error: (res: any) => { },
@@ -49,5 +51,21 @@ export class ReportDataService {
     } catch (e) {
       throw e;
     }
+  }
+  downloadReport(fileType:string,fileName: string) {
+    return this.http.get(`${this.reportUrl}download/${fileType}/${fileName}`, {
+      responseType: 'blob'
+    });
+  }
+
+  download(fileType:string,fileName: string) {
+    this.downloadReport(fileType,fileName).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
   }
 }

@@ -62,7 +62,7 @@ export class Login implements OnInit {
             //this.sidebar.updateMenuItems(res.userInfo);
             this.authService.startAutoLogoutWatcher();
             this.loadingService.hide();
-            this.router.navigate(['/app/dashboard']);
+            this.router.navigate(['/dashboard']);
             this.msgSvc.showSuccessMsg('Loggedin Successfully.');
           }
         },
