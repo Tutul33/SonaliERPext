@@ -2,7 +2,7 @@ import clone from 'clone';
 import { TreeNode } from 'primeng/api';
 
 export class GlobalMethods {
-  static isProduction = false;
+  static isProduction = true;
   static roleAdmin='Admin';
   static rowsPerPageOptions=[10, 25, 50, 100, 500, 1000,3000,5000,7000,10000];
   static pageSize=10;

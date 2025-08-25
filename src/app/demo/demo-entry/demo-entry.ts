@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { ImageModule } from 'primeng/image';
 // PrimeNG modules
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -35,6 +35,7 @@ import { LoadingService } from '../../shared/services/loading-service';
     CardModule,
     TableModule,
     FileUploadModule,
+    ImageModule
   ],
 })
 export class DemoEntry {

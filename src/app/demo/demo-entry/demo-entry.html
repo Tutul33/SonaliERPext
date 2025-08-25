@@ -87,9 +87,9 @@
                   @if(attachmentsAt(i).at(j).get('id')?.value>0 &&
                   attachmentsAt(i).at(j).get('tag')?.value==EntityState.Unchanged)
                   {
-                  <img [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="preview"
-                    class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" />
-
+                  <!-- <img [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="preview"
+                    class="ms-2 border rounded" style="width:40px; height:40px; object-fit:cover;" /> -->
+                  <p-image [src]="fileUrl + attachmentsAt(i).at(j).get('filePath')?.value" alt="Image" width="40px" height="40px" [preview]="true" />
                   }
                   @else{
                   @if(attachmentsAt(i).at(j)['previewUrl']){
