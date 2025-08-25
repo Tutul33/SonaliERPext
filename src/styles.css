@@ -29,11 +29,11 @@
 
 .app-header-expanded,
 .app-header-collapsed {
-  transition: left 0.3s ease; /* <-- makes header move smoothly */
+  transition: left 0.3s ease; 
 }
 
 .layout-wrapper .flex-grow-1.d-flex.flex-column main {
-  transition: margin-left 0.3s ease; /* <-- makes main content move smoothly */
+  transition: margin-left 0.3s ease; 
 }
 
 .layout-wrapper {
