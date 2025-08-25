@@ -4,10 +4,11 @@ import { Injectable, signal } from '@angular/core';
 export class PdfViewerService {
   _visible = false;
   private _pdfSrc = '';
-
-  open(src: string) {
+  _downloadFileName = "";
+  open(src: string,downloadFileName: string) {
     this._pdfSrc = src;
     this._visible = true;
+    this._downloadFileName = downloadFileName;
   }
 
   close() {
@@ -16,5 +17,9 @@ export class PdfViewerService {
 
   pdfSrc() {
     return this._pdfSrc;
+  }
+
+  downloadFileName(){
+    return this._downloadFileName;
   }
 }

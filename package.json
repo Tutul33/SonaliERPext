@@ -35,7 +35,6 @@
     "bootstrap-icons": "^1.13.1",
     "clone": "^2.1.2",
     "jquery": "^3.7.1",
-    "ng2-pdf-viewer": "^10.4.0",
     "ngx-extended-pdf-viewer": "^25.0.0",
     "primeng": "^20.0.1",
     "rxjs": "~7.8.0",

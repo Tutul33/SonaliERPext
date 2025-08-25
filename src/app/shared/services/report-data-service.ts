@@ -90,7 +90,7 @@ export class ReportDataService {
           const blobUrl = URL.createObjectURL(pdfBlob);
 
           // Open in the global PDF viewer
-          this.pdfService.open(blobUrl);
+          this.pdfService.open(blobUrl,fileName);
         },
         error: (err) => {
           console.error('Error fetching PDF', err);
