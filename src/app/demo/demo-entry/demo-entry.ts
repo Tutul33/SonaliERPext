@@ -72,7 +72,7 @@ export class DemoEntry {
       this.form = this.fb.group({
         id: 0,
         name: [null, Validators.required],
-        createDate: [null, Validators.required],
+        createDate: [new Date(), Validators.required],
         isActive: false,
         demoItems: this.fb.array([]),
       });
@@ -271,7 +271,7 @@ export class DemoEntry {
       }
       const attachments = item.get('demoItemFileAttachments') as FormArray;
       attachments.controls.forEach((att, j) => {
-        if (item.get('tag').value != EntityState.Deleted) {
+        if (item.get('tag').value == EntityState.Deleted) {
           att.patchValue({ tag: EntityState.Deleted });
         } else {
           var file: File = att['selectedFile'];
@@ -294,7 +294,7 @@ export class DemoEntry {
         //this.resetForm();
       },
       error: (err) => {
-        this.msgSvc.showErrorMsg(err);
+        this.msgSvc.showErrorMsg(err.error.message);
         this.loadingService.hide();
       },
     });
@@ -318,8 +318,7 @@ export class DemoEntry {
 
   clearForm() {
     try {
-      this.form.reset({ isActive: false });
-      this.demoItems.clear();
+      this.setFormData();
       this.addItem();
     } catch (error) {
       this.msgSvc.showErrorMsg(error);

@@ -68,13 +68,13 @@
                 <td>
                   <div class="d-flex justify-content-start">
                     <p-fileupload #fu mode="basic" chooseLabel="Choose" chooseIcon="pi pi-upload" name="demo[]"
-                      [multiple]="false" accept="image/*" maxFileSize="1000000" styleClass="p-button-sm" [auto]="true"
+                      [multiple]="false" accept="image/*" maxFileSize="10000000" styleClass="p-button-sm" [auto]="true"
                       (onSelect)="onFileSelect($event,i,j)" />
-                    <div class="mt-1">
+                    <!-- <div class="mt-1">
                       <small class="text-muted">
-                        {{ attachmentsAt(i).at(j).get('prvFileName')?.value }}
+                        {{ attachmentsAt(i).at(j).get('fileName')?.value }}
                       </small>
-                    </div>
+                    </div> -->
                   </div>
                   @if(attachmentsAt(i).at(j).get('fileName')?.invalid &&
                   attachmentsAt(i).at(j).get('fileName')?.touched)
@@ -95,8 +95,10 @@
                   }
                   @else{
                   @if(attachmentsAt(i).at(j)['previewUrl']){
-                  <img [src]="attachmentsAt(i).at(j)['previewUrl']" alt="preview" class="ms-2 border rounded"
-                    style="width:40px; height:40px; object-fit:cover;" />
+                  <!-- <img [src]="attachmentsAt(i).at(j)['previewUrl']" alt="preview" class="ms-2 border rounded"
+                    style="width:40px; height:40px; object-fit:cover;" /> -->
+                     <p-image [src]="attachmentsAt(i).at(j)['previewUrl']" alt="Image" width="40px"
+                    height="40px" [preview]="true" />
                   }
                   }
                 </td>
