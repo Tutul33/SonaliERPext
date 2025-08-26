@@ -9,8 +9,7 @@ import { PdfViewer } from './shared/component/pdf-viewer/pdf-viewer';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Toast, LoadingSpinner, CommonModule, Confirm,PdfViewer],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './app.html'
 })
 export class App {
   isLoggedIn:boolean=false;
