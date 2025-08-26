@@ -51,8 +51,8 @@ export class Login implements OnInit {
       const { userName, password } = this.loginForm.value;
 
       this.dataSvc.login(userName, password).subscribe({
-        next: (respose: any) => {
-          const res=respose.data;
+        next: (response: any) => {
+          const res=response.data;
           if (res) {            
             this.authService.login(res.userInfo, res.token);
             localStorage.setItem('userInfo', JSON.stringify(res.userInfo));
