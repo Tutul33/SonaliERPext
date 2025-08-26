@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { VoucherApproval } from './voucher-approval/voucher-approval';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'voucher-approval', pathMatch: 'full' },
   {
     path:'voucher-approval',
     component:VoucherApproval

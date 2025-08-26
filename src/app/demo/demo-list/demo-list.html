@@ -1,6 +1,7 @@
-<h3>
-    Demo List
-</h3>
+<div class="d-flex justify-content-between">
+    <h3>Demo List</h3>
+    <p-button label="Add New" styleClass="p-button-sm" (click)="routesToEntry()" severity="success"></p-button>
+</div>
 <p-table [value]="modelSvc.demoList" [tableStyle]="{ 'min-width': '50rem','border': '1px solid #e5e5e5' }">
     <ng-template #header>
         <tr>

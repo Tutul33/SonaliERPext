@@ -502,7 +502,7 @@ export class VoucherApproval {
       this.dataSvc.getVoucherDetailByVoucherNo(voucher.voucherNo).subscribe({
         next: (response: any) => {
           const res=response.data;
-          if (res) {
+          if (res) {console.log(res)
             const listVoucher = res.voucherList;
             if (listVoucher && listVoucher.length > 0) {
               this.modelSvc.prepareVoucherDetails(listVoucher);

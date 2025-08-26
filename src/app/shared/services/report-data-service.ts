@@ -3,6 +3,7 @@ import { GlobalMethods } from '../models/javascriptMethods';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { PdfViewerService } from './pdf.viewer.service';
+import { LoadingService } from './loading-service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { PdfViewerService } from './pdf.viewer.service';
 export class ReportDataService {
   private pdfService = inject(PdfViewerService);
   reportUrl: string = GlobalMethods.ApiUrl() + 'Reports/';
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private loadingSvc:LoadingService) {
 
   }
 
@@ -19,6 +20,7 @@ export class ReportDataService {
   }
   printReport(reportData: any, isDownload: boolean) {
     try {
+      this.loadingSvc.show();
       this.getReport(reportData).subscribe({
         next: async (res: any) => {
           let fileName = res.data.fileName;
@@ -67,6 +69,7 @@ export class ReportDataService {
   download(fileType: string, fileName: string) {
     try {
       this.downloadReport(fileType, fileName).subscribe(blob => {
+        this.loadingSvc.hide();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -75,6 +78,7 @@ export class ReportDataService {
         window.URL.revokeObjectURL(url);
       });
     } catch (error) {
+      this.loadingSvc.hide();
       throw error;
     }
   }
@@ -91,9 +95,11 @@ export class ReportDataService {
 
           // Open in the global PDF viewer
           this.pdfService.open(blobUrl,fileName);
+          this.loadingSvc.hide();
         },
         error: (err) => {
-          console.error('Error fetching PDF', err);
+          this.loadingSvc.hide();
+          throw err;
         }
       });
     } catch (error) {
@@ -103,6 +109,7 @@ export class ReportDataService {
 
   openInBrowser(extension, fileName) {
     try {
+      this.loadingSvc.hide();
       const url = GlobalMethods.ApiHost() + "reports/" + extension + "/" + fileName;
       window.open(url, '_blank');
     } catch (error) {

@@ -10,10 +10,11 @@ import { Router } from '@angular/router';
 import { LoadingService } from '../../shared/services/loading-service';
 import { GlobalMethods } from '../../shared/models/javascriptMethods';
 import { ReportDataService } from '../../shared/services/report-data-service';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-demo-list',
-  imports: [TableModule, BooleanToYesNoPipe, FormsModule, DatePipe],
+  imports: [TableModule, BooleanToYesNoPipe, FormsModule, DatePipe,ButtonModule],
   templateUrl: './demo-list.html',
   styleUrl: './demo-list.css'
 })
@@ -83,6 +84,7 @@ export class DemoList {
 
   print(data,type) {
     try {
+     
       this.dataSvc.getDemoById(data.id).subscribe({
         next: (res: any) => {
           let reportData = this.prepareVoucherOption(res.data,type);
@@ -125,6 +127,14 @@ export class DemoList {
       return params;
     } catch (e) {
       throw e;
+    }
+  }
+
+  routesToEntry() {
+    try {
+      this.router.navigate(['/demo/demo-entry']);
+    } catch (error) {
+      this.msgSvc.showErrorMsg(error);
     }
   }
 }

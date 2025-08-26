@@ -10,10 +10,11 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectIsLoggedIn } from '../shared/store/auth.selectors';
 import { logout } from '../shared/store/auth.actions';
+import { Breadcrumbs } from '../shared/component/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-default',
-  imports: [CommonModule, Sidebar, Header, RouterOutlet, AsyncPipe, Footer],
+  imports: [CommonModule, Sidebar, Header, RouterOutlet, AsyncPipe, Footer,Breadcrumbs],
   templateUrl: './default.html',
   styleUrl: './default.css'
 })

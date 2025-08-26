@@ -4,6 +4,7 @@ import { DemoEntry } from './demo-entry/demo-entry';
 import { DemoList } from './demo-list/demo-list';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'demo-entry', pathMatch: 'full' },
   {
     path: 'demo-entry',
     component: DemoEntry
