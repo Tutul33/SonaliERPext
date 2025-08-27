@@ -379,5 +379,18 @@ prepareSortData(sortObj, list) {
   });
 }
 
+prepareDateForPrint(data){
+  try {
+    return data.map((item)=>({
+      voucherNo:item.voucherNo,
+      amt:item.amt,
+      entryDate:item.entryDate,
+      userId:item.userId,
+      createDate:item.createDate
+    }));
+  } catch (error) {
+    throw error;
+  }
+}
 
 }

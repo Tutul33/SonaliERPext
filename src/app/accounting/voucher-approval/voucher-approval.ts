@@ -26,6 +26,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { GlobalMethods } from '../../shared/models/javascriptMethods';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../shared/store/auth.selectors';
+import { ReportDataService } from '../../shared/services/report-data-service';
 
 
 @Component({
@@ -72,6 +73,7 @@ export class VoucherApproval {
   pageNumber: number = GlobalMethods.pageNumber;
   pageSize: number = GlobalMethods.pageSize;
   //
+  reportRenderingType:any=GlobalMethods.reportRenderingType;
   userIds: any = '';
   voucherNos: any = '';
   totalRecords: number = 0;
@@ -93,7 +95,8 @@ export class VoucherApproval {
     public modelSvc: VoucherModelService,
     private route: ActivatedRoute,
     private msgSvc: InformationService,
-    private confirmDialog: ConfirmationDialogService
+    private confirmDialog: ConfirmationDialogService,    
+    private reportSvc:ReportDataService
   ) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
   }
@@ -625,6 +628,52 @@ export class VoucherApproval {
       this.modelSvc.prepareVoucherDetails(this.modelSvc.tempVoucher);
     } catch (error) {
       this.msgSvc.showErrorMsg(error);
+    }
+  }
+
+  print() {
+    try {
+     
+          let reportData = this.prepareVoucherOption(this.listVoucher,this.reportRenderingType.PDF);
+          this.reportSvc.printReport(reportData,false);
+       
+    } catch (e) {
+      throw e;
+    }
+  }
+  private prepareVoucherOption(data: any[],type) {
+    try {
+      let title = null;
+      if (data.length > 0) title = data[0].title;
+      
+      return {
+        reportName: 'DemoReport',
+        reportType: type,
+        userID: 1,
+        data: this.modelSvc.prepareDateForPrint(data),
+        params: this.getRptParameter(),
+        dataSetName: "sp_GetVoucherApprovalList",
+      };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  getRptParameter() {
+    try {
+      var params = [
+        {
+          key: "Title",
+          value: "Voucher Approval List",
+        }  ,
+        {
+          key: "Company",
+          value: "Sonali Life Insurance Ltd.",
+        }       
+      ];
+      return params;
+    } catch (e) {
+      throw e;
     }
   }
 }
