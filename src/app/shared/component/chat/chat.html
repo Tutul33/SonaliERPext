@@ -1,0 +1,33 @@
+@if(!chatVisible){
+    <button pButton type="button"      
+      class="chat-float-btn" 
+      (click)="toggleChat()">
+      <i class="bi bi-chat"></i>
+    </button>
+}
+
+<!-- Chat Panel -->
+<div [class.show]="chatVisible" class="chat-panel">
+  <div class="chat-header">
+    <span>Chat</span>
+    <p-button (click)="toggleChat()" severity="warn" styleClass="p-button-sm" ><i class="bi bi-x"></i></p-button>
+  </div>
+
+  <div class="chat-messages">
+    @for(m of messages;track $index){
+        <div class="chat-message">
+          {{ m }}
+        </div>
+       }
+  </div>
+
+  <div class="chat-input">
+    <input 
+      pInputText 
+      [(ngModel)]="message" 
+      placeholder="Type message" 
+      (keyup.enter)="sendMessage()" />
+    
+    <p-button (click)="sendMessage()" severity="success" ><i class="bi bi-arrow-right"></i></p-button>
+  </div>
+</div>

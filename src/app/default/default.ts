@@ -11,10 +11,11 @@ import { Store } from '@ngrx/store';
 import { selectIsLoggedIn } from '../shared/store/auth.selectors';
 import { logout } from '../shared/store/auth.actions';
 import { Breadcrumbs } from '../shared/component/breadcrumbs/breadcrumbs';
+import { Chat } from '../shared/component/chat/chat';
 
 @Component({
   selector: 'app-default',
-  imports: [CommonModule, Sidebar, Header, RouterOutlet, AsyncPipe, Footer,Breadcrumbs],
+  imports: [CommonModule, Sidebar, Header, RouterOutlet, AsyncPipe, Footer,Breadcrumbs,Chat],
   templateUrl: './default.html',
   styleUrl: './default.css'
 })
