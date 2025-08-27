@@ -36,7 +36,7 @@ export class UserRoleMapModelService {
   setCheckAll(){
     try {
       const totalActiveList=this.userRoleMapModelList.filter(x=>x.isActive==true);
-      if(this.userRoleMapModelList.length==totalActiveList.length){
+      if((this.userRoleMapModelList.length>0)&& (this.userRoleMapModelList.length==totalActiveList.length)){
          this.isCheckAll=true;
       }else{
          this.isCheckAll=false;
