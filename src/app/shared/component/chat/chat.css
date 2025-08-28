@@ -45,6 +45,7 @@
 
   /* Transition for smooth animation */
   transition: all 0.3s ease-in-out;
+  border-radius: 10px;
 }
 
 .chat-panel.show {
@@ -62,6 +63,8 @@
   color: #fff;
   align-items: center;
   flex-shrink: 0;           /* header fixed height */
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
 }
 
 .chat-body {
