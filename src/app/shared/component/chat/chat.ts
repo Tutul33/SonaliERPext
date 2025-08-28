@@ -65,7 +65,7 @@ export class Chat implements AfterViewChecked {
   searchUser() {
     try {
       if (this.searchUserObj) {
-        this.activeUsers = this.tempUserList.filter(x => x.includes(this.searchUserObj));
+        this.activeUsers = this.tempUserList.filter(x => x.userName.includes(this.searchUserObj));
       } else {
         this.activeUsers = this.tempUserList;
       }

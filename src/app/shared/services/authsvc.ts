@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { loginSuccess, logout } from "../store/auth.actions";
+import { SignalRService } from "./signalr-service";
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { loginSuccess, logout } from "../store/auth.actions";
 export class Authsvc {
   private logoutTimer: any;
 
-  constructor(private router: Router, private store: Store) {
+  constructor(private router: Router, private store: Store,private signalR:SignalRService) {
     const token = localStorage.getItem('access_token');
     const user = localStorage.getItem('userInfo');
     if (token && user) {
@@ -30,6 +31,7 @@ export class Authsvc {
     localStorage.removeItem('userInfo');
     this.store.dispatch(logout());
     if (this.logoutTimer) clearTimeout(this.logoutTimer);
+    this.signalR.stopConnection();
     this.router.navigate(['/login']);
   }
 
@@ -58,7 +60,7 @@ export class Authsvc {
     }
   }
 
-  // ✅ Add these for the guard
+  //  Add these for the guard
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }

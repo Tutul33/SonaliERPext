@@ -2,19 +2,20 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable } from 'rxjs';
+import { GlobalMethods } from '../models/javascriptMethods';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
   private isConnected = false;
-  
+  private url:any=GlobalMethods.ApiHost();
   constructor(private http:HttpClient){
 
   }
 
   startConnection(username: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5020/chathub?username=${username}`)
+      .withUrl(this.url+`chathub?username=${username}`)
       .withAutomaticReconnect()
       .build();
 
@@ -22,6 +23,13 @@ export class SignalRService {
       .start()
       .then(() => this.isConnected = true)
       .catch(err => console.error('SignalR Connection Error:', err));
+  }
+
+  stopConnection() {
+    if (this.hubConnection) {
+      this.hubConnection.stop()
+        .catch(err => console.error('Error stopping SignalR connection:', err));
+    }
   }
 
   sendPrivateMessage(sender: string, receiver: string, message: string) {
@@ -38,8 +46,10 @@ export class SignalRService {
   }
 
    GetFinanceAndAccountUsers(): Observable<any> {   
+    const url=this.url+`api/voucher/GetFinanceAndAccountUsers`;
+    debugger;
         return this.http.get<any>(
-           `http://localhost:5020/api/voucher/GetFinanceAndAccountUsers`
+           url
         );
      }
 }

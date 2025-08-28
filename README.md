@@ -264,7 +264,7 @@ constructor(private store: Store, private modelSvc: ModelService) {
 }
 ```
 
-✅ This setup ensures **centralized authentication state**, **auto-logout**, and **reactive user info distribution** across components.
+This setup ensures **centralized authentication state**, **auto-logout**, and **reactive user info distribution** across components.
 
 ---
 
