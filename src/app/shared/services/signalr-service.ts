@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable } from 'rxjs';
 import { GlobalMethods } from '../models/javascriptMethods';
+import { FileMessage } from '../models/FIleMessage';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
@@ -36,9 +37,20 @@ export class SignalRService {
     if (!this.isConnected) return;
     this.hubConnection.invoke('SendPrivateMessage', sender, receiver, message);
   }
+   // New method to send files
+  sendPrivateFile(sender: string, receiver: string, file: FileMessage) {
+    if (!this.isConnected) return;
+    this.hubConnection.invoke('SendPrivateFile', sender, receiver, file)
+      .catch(err => console.error('Error sending file via SignalR:', err));
+  }
 
   onMessage(callback: (fromUser: string, message: string) => void) {
     this.hubConnection.on('ReceiveMessage', callback);
+  }
+
+ //  New method to receive files
+  onFile(callback: (fromUser: string, file: FileMessage) => void) {
+    this.hubConnection.on('ReceiveFile', callback);
   }
 
   onActiveUsers(callback: (users: string[]) => void) {

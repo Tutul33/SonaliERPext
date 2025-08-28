@@ -36,7 +36,7 @@
       <p-tabs [(value)]="activeTabIndex" scrollable (valueChange)="onTabChange($event)">
         <p-tablist>
           @for(tab of chatTabs;track $index){
-          <p-tab [value]="$index" >
+          <p-tab [value]="$index">
             <span>
               {{ tab.user }}
               <sup *ngIf="tab.totalUnread > 0" class="unread-badge">
@@ -52,18 +52,53 @@
           @for(tab of chatTabs;track $index){
           <p-tabpanel [value]="$index">
             <div class="chat-panel-content">
-              <div #chatMessagesContainer class="chat-messages">
+              <!-- <div #chatMessagesContainer class="chat-messages">
                 @for(m of tab.messages;track $index){
                 <div>
                   <b>{{ m.sender }}:</b> {{ m.text }}
                 </div>
                 }
-              </div>
+              </div> -->
 
-              <div class="chat-input">
+              <!-- <div class="chat-input">
                 <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" />
                 <p-button (click)="send(tab)" severity="success"><i class="bi bi-arrow-right"></i></p-button>
+              </div> -->
+              <div #chatMessagesContainer class="chat-messages">
+                <div *ngFor="let m of tab.messages">
+                  <b>{{ m.sender }}:</b> {{ m.text }}
+                  <div *ngIf="m.file">
+                    <ng-container *ngIf="m.file.fileType.startsWith('image/')">
+                      <img [src]="m.file.fileData" [alt]="m.file.fileName"
+                        style="max-width:200px; max-height:200px; display:block;" />
+                    </ng-container>
+                    <a *ngIf="!m.file.fileType.startsWith('image/')" [href]="m.file.fileData"
+                      [download]="m.file.fileName">
+                      Download {{ m.file.fileName }}
+                    </a>
+                  </div>
+                </div>
               </div>
+              <div class="chat-input">
+                <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" />
+
+                <!-- File input -->
+                <input type="file" (change)="onFileSelected($event, tab)" />
+
+                <!-- File preview -->
+                <div *ngIf="tab.pendingFile" class="file-preview">
+                  <ng-container *ngIf="tab.pendingFile.fileType.startsWith('image/')">
+                    <img [src]="tab.pendingFile.fileData" [alt]="tab.pendingFile.fileName"
+                      style="max-width:100px; max-height:100px;" />
+                  </ng-container>
+                  <div *ngIf="!tab.pendingFile.fileType.startsWith('image/')">
+                    {{ tab.pendingFile.fileName }}
+                  </div>
+                </div>
+
+                <p-button (click)="send(tab)" severity="success"><i class="bi bi-arrow-right"></i></p-button>
+              </div>
+
             </div>
           </p-tabpanel>
           }
