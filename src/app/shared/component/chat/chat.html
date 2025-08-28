@@ -1,33 +1,74 @@
-@if(!chatVisible){
-    <button pButton type="button"      
-      class="chat-float-btn" 
-      (click)="toggleChat()">
-      <i class="bi bi-chat"></i>
-    </button>
-}
+<!-- Floating Chat Button -->
+<button pButton type="button" class="chat-float-btn" (click)="toggleChat()">
+  <i class="bi bi-chat"></i>
+</button>
 
-<!-- Chat Panel -->
-<div [class.show]="chatVisible" class="chat-panel">
+<!-- Chat Panel Popup -->
+<div class="chat-panel" [class.show]="chatVisible">
   <div class="chat-header">
     <span>Chat</span>
-    <p-button (click)="toggleChat()" severity="warn" styleClass="p-button-sm" ><i class="bi bi-x"></i></p-button>
+    <p-button (click)="toggleChat()" styleClass="p-button-sm" severity="warn">
+      <i class="bi bi-x"></i>
+    </p-button>
   </div>
 
-  <div class="chat-messages">
-    @for(m of messages;track $index){
-        <div class="chat-message">
-          {{ m }}
-        </div>
-       }
-  </div>
+  <div class="chat-body">
+    <div class="chat-sidebar">
+      <div class="chat-sidebar-header">
+        <h4>Users</h4>
+        <input placeholder="Search User" (keyup)="searchUser()" [(ngModel)]="searchUserObj" />
+      </div>
 
-  <div class="chat-input">
-    <input 
-      pInputText 
-      [(ngModel)]="message" 
-      placeholder="Type message" 
-      (keyup.enter)="sendMessage()" />
-    
-    <p-button (click)="sendMessage()" severity="success" ><i class="bi bi-arrow-right"></i></p-button>
+      <div class="chat-sidebar-list">
+        <ul>
+          @for(u of activeUsers; track $index){
+          <li (click)="openChat(u.userName)">
+            {{ u.userName }}<span
+              [ngClass]="{ 'text-success': u.isOnline }">{{u.isOnline?'(Online)':'(Offline)'}}</span>
+          </li>
+          }
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="chat-tabs">
+      <p-tabs [(value)]="activeTabIndex" scrollable (valueChange)="onTabChange($event)">
+        <p-tablist>
+          @for(tab of chatTabs;track $index){
+          <p-tab [value]="$index" >
+            <span>
+              {{ tab.user }}
+              <sup *ngIf="tab.totalUnread > 0" class="unread-badge">
+                {{ tab.totalUnread }}
+              </sup>
+            </span>
+            <span (click)="closeTab(tab)"><i class="bi bi-x"></i></span>
+          </p-tab>
+          }
+        </p-tablist>
+
+        <p-tabpanels>
+          @for(tab of chatTabs;track $index){
+          <p-tabpanel [value]="$index">
+            <div class="chat-panel-content">
+              <div #chatMessagesContainer class="chat-messages">
+                @for(m of tab.messages;track $index){
+                <div>
+                  <b>{{ m.sender }}:</b> {{ m.text }}
+                </div>
+                }
+              </div>
+
+              <div class="chat-input">
+                <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" />
+                <p-button (click)="send(tab)" severity="success"><i class="bi bi-arrow-right"></i></p-button>
+              </div>
+            </div>
+          </p-tabpanel>
+          }
+        </p-tabpanels>
+      </p-tabs>
+    </div>
   </div>
 </div>
