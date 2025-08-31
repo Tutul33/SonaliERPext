@@ -1,50 +1,45 @@
-import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { SignalRService } from '../../services/signalr-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from "primeng/button";
-import { Observable } from 'rxjs';
+import { TabsModule } from 'primeng/tabs';
+import { FileUploadModule } from 'primeng/fileupload';
+import { ImageModule } from 'primeng/image';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../store/auth.selectors';
-import { TabsModule } from 'primeng/tabs';
-
-interface ChatTab {
-  user: string;
-  messages: { sender: string; text: string; isRead: boolean; file?: FileMessage }[];
-  newMessage: string;
-  totalUnread: number;
-  pendingFile?: FileMessage;
-}
-
-interface FileMessage {
-  fileName: string;
-  fileType: string;
-  fileData: string; // Base64
-}
+import { Observable } from 'rxjs';
+import { ChatTab, FileMessage, ChatMessage } from '../../models/FIleMessage';
+import { EntityState, GlobalMethods } from '../../models/javascriptMethods';
 
 @Component({
   selector: 'app-chat',
-  imports: [CommonModule, FormsModule, Button, TabsModule],
+  imports: [CommonModule, FormsModule, Button, TabsModule, FileUploadModule, ImageModule],
   templateUrl: './chat.html',
   styleUrls: ['./chat.css']
 })
 export class Chat implements AfterViewChecked {
+
   loggedUser$: Observable<any | null>;
   loggedBy: string = '';
   chatVisible = false;
+
   activeUsers: any[] = [];
   chatTabs: ChatTab[] = [];
   activeTabIndex = 0;
   tempUserList: any;
   searchUserObj: string = '';
-  @ViewChild('chatMessagesContainer') chatMessagesContainer!: ElementRef;
+  fileUrl: any = GlobalMethods.FileUrl();
+
+  @ViewChildren('chatMessagesContainer') chatContainers!: QueryList<ElementRef>;
 
   constructor(private store: Store, private signalR: SignalRService) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.getFinanceAndAccountUsers();
+    this.setLoggedUserInfo();
   }
 
   ngAfterViewChecked() {
@@ -53,79 +48,44 @@ export class Chat implements AfterViewChecked {
 
   scrollToBottom() {
     try {
-      const el = this.chatMessagesContainer.nativeElement;
-      el.scrollTop = el.scrollHeight;
-    } catch (err) { }
+      const el = this.chatContainers.toArray()[this.activeTabIndex]?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    } catch {}
+  }
+
+  toggleChat() {
+    this.chatVisible = !this.chatVisible;
   }
 
   getFinanceAndAccountUsers() {
-    this.signalR.GetFinanceAndAccountUsers().subscribe({
-      next: (response: any) => {
-        const list = response?.data?.list ?? [];
-        this.activeUsers = list.filter(x => x.userName != this.loggedBy).map((u: any) => ({ userName: u.userName, isOnline: false }));
-        this.tempUserList = list.filter(x => x.userName != this.loggedBy).map((u: any) => ({ userName: u.userName, isOnline: false }));
-        this.setLoggedUserInfo();
-      },
-      error: err => console.error(err)
+    this.signalR.GetFinanceAndAccountUsers().subscribe(res => {
+      const list = res?.data?.list ?? [];
+      this.activeUsers = list.filter(x => x.userName !== this.loggedBy)
+        .map(u => ({ userName: u.userName, isOnline: false }));
+      this.tempUserList = [...this.activeUsers];
     });
   }
 
   searchUser() {
     this.activeUsers = this.searchUserObj
       ? this.tempUserList.filter(x => x.userName.includes(this.searchUserObj))
-      : this.tempUserList;
+      : [...this.tempUserList];
   }
 
   setLoggedUserInfo() {
     this.loggedUser$.subscribe(user => {
-      if (user) {
-        this.loggedBy = user.userName;
-        this.signalR.startConnection(this.loggedBy);
+      if (!user) return;
+      this.loggedBy = user.userName;
+      this.signalR.startConnection(this.loggedBy);
 
-        this.signalR.onMessage((sender, msg) => this.handleMessage(sender, msg));
-        this.signalR.onFile((sender, fileMsg) => this.handleFile(sender, fileMsg));
-
-        this.signalR.onActiveUsers(users => {
-          const activeUsers = users.filter(u => u !== this.loggedBy);
-          this.activeUsers.forEach(item => item.isOnline = activeUsers.includes(item.userName));
-        });
-      }
+      this.signalR.onMessage((sender, msg) => this.handleMessage(sender, msg));
+      this.signalR.onFile((sender, files) => this.handleFile(sender, files));
+      this.signalR.onMessageUpdate((msg) => this.applyUpdatedMessage(msg));
+      this.signalR.onActiveUsers(users => {
+        const activeUserNames = users.filter(u => u !== this.loggedBy);
+        this.activeUsers.forEach(u => u.isOnline = activeUserNames.includes(u.userName));
+      });
     });
-  }
-
-  handleMessage(sender: string, msg: string) {
-    let tab = this.chatTabs.find(t => t.user === sender);
-    if (!tab) {
-      tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
-      this.chatTabs.push(tab);
-    }
-    tab.messages.push({ sender, text: msg, isRead: false });
-    const isActive = this.chatTabs.indexOf(tab) === this.activeTabIndex;
-    if (!isActive) tab.totalUnread++;
-  }
-
-  handleFile(sender: string, fileMsg: FileMessage) {
-    let tab = this.chatTabs.find(t => t.user === sender);
-    if (!tab) {
-      tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
-      this.chatTabs.push(tab);
-    }
-    tab.messages.push({
-      sender,
-      text: `Sent a file: ${fileMsg.fileName}`,
-      isRead: false,
-      file: fileMsg
-    });
-    const isActive = this.chatTabs.indexOf(tab) === this.activeTabIndex;
-    if (!isActive) tab.totalUnread++;
-  }
-
-  toggleChat() {
-    this.chatVisible = !this.chatVisible;
-    if (this.chatVisible) {
-      this.getFinanceAndAccountUsers();
-      this.setLoggedUserInfo();
-    }
   }
 
   openChat(user: string) {
@@ -141,51 +101,72 @@ export class Chat implements AfterViewChecked {
     tab.messages.forEach(m => m.isRead = true);
   }
 
-  send(tab: ChatTab) {
-    if (!tab.newMessage.trim() && !tab.pendingFile) return;
-
-    // Send text message
-    if (tab.newMessage.trim()) {
-      this.signalR.sendPrivateMessage(this.loggedBy, tab.user, tab.newMessage);
-      tab.messages.push({ sender: this.loggedBy, text: tab.newMessage, isRead: true });
-      tab.newMessage = '';
+  handleMessage(sender: string, msg: ChatMessage) {
+    let tab = this.chatTabs.find(t => t.user === sender);
+    if (!tab) {
+      tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
+      this.chatTabs.push(tab);
     }
-
-    // Send file if any
-    if (tab.pendingFile) {
-      this.signalR.sendPrivateFile(this.loggedBy, tab.user, tab.pendingFile);
-      tab.messages.push({
-        sender: this.loggedBy,
-        text: `Sent a file: ${tab.pendingFile.fileName}`,
-        isRead: true,
-        file: tab.pendingFile
-      });
-      tab.pendingFile = undefined;
-    }
+    tab.messages.push(msg);
+    if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
   }
 
-  // onFileSelected(event: any, tab: ChatTab) {
-  //   const file = event.target.files[0];
-  //   if (!file) return;
+  handleFile(sender: string, files: FileMessage[]) {
+    let tab = this.chatTabs.find(t => t.user === sender);
+    if (!tab) {
+      tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
+      this.chatTabs.push(tab);
+    }
+    tab.messages.push({
+      sender,
+      receiver: sender,
+      text: `Sent ${files.length} file(s)`,
+      isRead: false,
+      files,
+      sentDate: new Date(),
+      tag: EntityState.Added
+    });
+    if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
+  }
 
-  //   const reader = new FileReader();
-  //   reader.onload = () => {
-  //     const fileMessage: FileMessage = {
-  //       fileName: file.name,
-  //       fileType: file.type,
-  //       fileData: reader.result as string
-  //     };
-
-  //     this.signalR.sendPrivateFile(this.loggedBy, tab.user, fileMessage);
-  //     tab.messages.push({
-  //       sender: this.loggedBy,
-  //       text: `Sent a file: ${file.name}`,
-  //       isRead: true,
-  //       file: fileMessage
-  //     });
-  //   };
-  //   reader.readAsDataURL(file);
-  // }
+  send(tab: ChatTab) {
+    // Multiple files + message
+    if ((tab.newMessage?.trim() || tab.pendingFiles?.length > 0) && tab.pendingFiles?.length) {
+      this.signalR.uploadChatFiles(this.loggedBy, tab.user, Array.from(tab.pendingFiles), tab.newMessage)
+        .subscribe({
+          next: (fileMessages) => {
+            const msg: ChatMessage = {
+              sender: this.loggedBy,
+              receiver: tab.user,
+              text: tab.newMessage || `Sent ${fileMessages.length} files`,
+              files: fileMessages,
+              isRead: true,
+              sentDate: new Date(),
+              tag: EntityState.Added
+            };
+            tab.messages.push(msg);
+            tab.pendingFiles = undefined;
+            tab.previewFiles = undefined;
+            tab.newMessage = '';
+          },
+          error: err => console.error(err)
+        });
+    }
+    // Text only
+    else if (tab.newMessage?.trim()) {
+      const msg: ChatMessage = {
+        sender: this.loggedBy,
+        receiver: tab.user,
+        text: tab.newMessage,
+        isRead: true,
+        sentDate: new Date(),
+        tag: EntityState.Added
+      };
+      this.signalR.sendPrivateMessage(this.loggedBy, tab.user, tab.newMessage);
+      tab.messages.push(msg);
+      tab.newMessage = '';
+    }
+  }
 
   closeTab(tab: ChatTab) {
     this.chatTabs = this.chatTabs.filter(x => x.user != tab.user);
@@ -200,19 +181,63 @@ export class Chat implements AfterViewChecked {
     }
   }
 
-  onFileSelected(event: any, tab: ChatTab) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      tab.pendingFile = {
-        fileName: file.name,
-        fileType: file.type,
-        fileData: reader.result as string
+  onFilesSelected(event: any, tab: ChatTab) {
+    if (!event || !event.files?.length) return;
+    tab.pendingFiles = event.files;
+    tab.previewFiles = [];
+    Array.from(event.files).forEach((file:any) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        tab.previewFiles?.push({
+          fileName: file.name,
+          fileType: file.type,
+          fileData: reader.result as string,
+          sentDate: new Date(),
+          tag: EntityState.Added
+        });
       };
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
+  deleteFile(tab: ChatTab, file: FileMessage) {
+    if (file.id) {
+      this.signalR.deleteFile(file.id).subscribe(() => {
+        tab.messages.forEach(m => m.files = m.files?.filter(f => f.id !== file.id));
+      });
+    } else {
+      tab.previewFiles = tab.previewFiles?.filter(f => f !== file);
+      tab.pendingFiles = tab.pendingFiles?.filter(f => f.name !== file.fileName);
+    }
+  }
+
+  editMessage(tab: ChatTab, msg: ChatMessage) {
+    msg.editing = true;
+  }
+
+  saveMessage(tab: ChatTab, msg: ChatMessage) {
+    this.signalR.updateMessage(msg).subscribe({
+      next: updated => Object.assign(msg, updated),
+      error: err => console.error(err)
+    });
+    msg.editing = false;
+  }
+
+  cancelEdit(msg: ChatMessage) {
+    msg.editing = false;
+  }
+
+  applyUpdatedMessage(msg: ChatMessage) {
+    const tab = this.chatTabs.find(t => t.user === msg.receiver || t.user === msg.sender);
+    if (!tab) return;
+    const message = tab.messages.find(m => m.id === msg.id);
+    if (message) Object.assign(message, msg);
+  }
+
+  download(file: FileMessage) {
+    try {
+      const fileType = file.fileName.split('.').pop() || '';
+      this.signalR.download(fileType, file.fileUrl || file.fileName);
+    } catch {}
+  }
 }

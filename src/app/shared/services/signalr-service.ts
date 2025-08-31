@@ -3,20 +3,20 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable } from 'rxjs';
 import { GlobalMethods } from '../models/javascriptMethods';
-import { FileMessage } from '../models/FIleMessage';
+import { ChatMessage, FileMessage } from '../models/FIleMessage';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
   private isConnected = false;
-  private url:any=GlobalMethods.ApiHost();
-  constructor(private http:HttpClient){
+  private url: any = GlobalMethods.ApiHost();
+  constructor(private http: HttpClient) {
 
   }
 
   startConnection(username: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(this.url+`chathub?username=${username}`)
+      .withUrl(this.url + `chathub?username=${username}`)
       .withAutomaticReconnect()
       .build();
 
@@ -37,19 +37,19 @@ export class SignalRService {
     if (!this.isConnected) return;
     this.hubConnection.invoke('SendPrivateMessage', sender, receiver, message);
   }
-   // New method to send files
+  // New method to send files
   sendPrivateFile(sender: string, receiver: string, file: FileMessage) {
     if (!this.isConnected) return;
     this.hubConnection.invoke('SendPrivateFile', sender, receiver, file)
       .catch(err => console.error('Error sending file via SignalR:', err));
   }
 
-  onMessage(callback: (fromUser: string, message: string) => void) {
+  onMessage(callback: (fromUser: string, message: ChatMessage) => void) {
     this.hubConnection.on('ReceiveMessage', callback);
   }
 
- //  New method to receive files
-  onFile(callback: (fromUser: string, file: FileMessage) => void) {
+  //  New method to receive files
+  onFile(callback: (fromUser: string, file: FileMessage[]) => void) {
     this.hubConnection.on('ReceiveFile', callback);
   }
 
@@ -57,11 +57,66 @@ export class SignalRService {
     this.hubConnection.on('ActiveUsers', callback);
   }
 
-   GetFinanceAndAccountUsers(): Observable<any> {   
-    const url=this.url+`api/voucher/GetFinanceAndAccountUsers`;
-    debugger;
-        return this.http.get<any>(
-           url
-        );
-     }
+  GetFinanceAndAccountUsers(): Observable<any> {
+    const url = this.url + `api/voucher/GetFinanceAndAccountUsers`;
+    return this.http.get<any>(
+      url
+    );
+  }
+  
+  // uploadChatFile(sender: string, receiver: string, file: File,messages?:string): Observable<FileMessage> {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   if(messages){
+  //     formData.append('message', messages);
+  //   }
+  //   const url = `${this.url}api/chat/upload/${receiver}?sender=${sender}`;
+  //   return this.http.post<FileMessage>(url, formData);
+  // }
+
+  downloadReport(fileType: string, fileName: string) {
+    try {
+      return this.http.get(`${this.url}api/chat/download/${fileType}/${fileName}`, {
+        responseType: 'blob'
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  download(fileType: string, fileName: string) {
+    try {
+      this.downloadReport(fileType, fileName).subscribe(blob => {
+        //this.loadingSvc.hide();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      //this.loadingSvc.hide();
+      throw error;
+    }
+  }
+
+  updateMessage(msg: ChatMessage): Observable<ChatMessage> {
+  return this.http.put<ChatMessage>(`${this.url}api/chat/update-message`, msg);
+}
+
+deleteFile(fileId: number): Observable<any> {
+  return this.http.delete(`${this.url}api/chat/delete-file/${fileId}`);
+}
+
+uploadChatFiles(sender: string, receiver: string, files: File[], message?: string): Observable<FileMessage[]> {
+  const formData = new FormData();
+  files.forEach(f => formData.append('file', f));
+  if(message) formData.append('message', message);
+  return this.http.post<FileMessage[]>(`${this.url}api/chat/upload/${receiver}?sender=${sender}`, formData);
+}
+
+onMessageUpdate(callback: (msg: ChatMessage) => void) {
+  this.hubConnection.on('ReceiveUpdatedMessage', callback);
+}
 }
