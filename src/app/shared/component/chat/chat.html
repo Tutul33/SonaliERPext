@@ -45,17 +45,17 @@
               <div class="chat-message">
                 <div class="message-content">
                   <b>{{ m.sender }}:</b>
-                  @if(!m.editing){<span>{{ m.text }}</span>}
-                  @if(m.editing){<input [(ngModel)]="m.text" />}
-                  @if(!m.editing){<button (click)="editMessage(tab,m)">Edit</button>}
-                  @if(m.editing){<button (click)="saveMessage(tab,m)">Save</button>}
-                  @if(m.editing){<button (click)="cancelEdit(m)">Cancel</button>}
+                  @if(!(m.tag==3)){<span>{{ m.text }}</span>}
+                  @if(m.tag==3){<input [(ngModel)]="m.text" />}
+                  @if(!(m.tag==3)){<button (click)="editMessage(tab,m)">Edit</button>}
+                  @if(m.tag==3){<button (click)="saveMessage(tab,m)">Save</button>}
+                  @if(m.tag==3){<button (click)="cancelEdit(m)">Cancel</button>}
 
                   @if(m.files?.length){
                   <div>
                     @for(f of m.files;track $index){
                     <div>
-                      <span>{{ f.fileName }}</span>
+                      <p-image [src]="fileUrl+f.fileUrl" alt="Image" width="40px" height="40px" [preview]="true" />
                       <a href="javascript:void(0)" (click)="deleteFile(tab,f)">Delete</a>
                     </div>
                     }

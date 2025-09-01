@@ -44,12 +44,12 @@ export class SignalRService {
       .catch(err => console.error('Error sending file via SignalR:', err));
   }
 
-  onMessage(callback: (fromUser: string, message: ChatMessage) => void) {
+  onMessage(callback: (fromUser: string, message: any) => void) {
     this.hubConnection.on('ReceiveMessage', callback);
   }
 
   //  New method to receive files
-  onFile(callback: (fromUser: string, file: FileMessage[]) => void) {
+  onFile(callback: (fromUser: string, file: any[]) => void) {
     this.hubConnection.on('ReceiveFile', callback);
   }
 
@@ -111,7 +111,7 @@ deleteFile(fileId: number): Observable<any> {
 
 uploadChatFiles(sender: string, receiver: string, files: File[], message?: string): Observable<FileMessage[]> {
   const formData = new FormData();
-  files.forEach(f => formData.append('file', f));
+  files.forEach(f => formData.append('files', f));
   if(message) formData.append('message', message);
   return this.http.post<FileMessage[]>(`${this.url}api/chat/send/${receiver}?sender=${sender}`, formData);
 }

@@ -29,7 +29,7 @@ export class Chat implements AfterViewChecked {
   activeTabIndex = 0;
   tempUserList: any;
   searchUserObj: string = '';
-  fileUrl: any = GlobalMethods.FileUrl();
+  fileUrl: any = GlobalMethods.FileUrl()+'ChatFiles/';
 
   @ViewChildren('chatMessagesContainer') chatContainers!: QueryList<ElementRef>;
 
@@ -93,8 +93,14 @@ export class Chat implements AfterViewChecked {
       this.loggedBy = user.userName;
       this.signalR.startConnection(this.loggedBy);
 
-      this.signalR.onMessage((sender, msg) => this.handleMessage(sender, msg));
-      this.signalR.onFile((sender, files) => this.handleFile(sender, files));
+      this.signalR.onMessage((sender, msg) => {
+        debugger
+        this.handleMessage(sender, msg)
+      });
+      this.signalR.onFile((sender, msg:any) => {
+        debugger
+        this.handleFile(sender, msg.files)
+      });
       this.signalR.onMessageUpdate((msg) => this.applyUpdatedMessage(msg));
       this.signalR.onActiveUsers(users => {
         const activeUserNames = users.filter(u => u !== this.loggedBy);
@@ -116,7 +122,8 @@ export class Chat implements AfterViewChecked {
     tab.messages.forEach(m => m.isRead = true);
   }
 
-  handleMessage(sender: string, msg: ChatMessage) {
+  handleMessage(sender: string, msg: any) {
+    debugger
     let tab = this.chatTabs.find(t => t.user === sender);
     if (!tab) {
       tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
@@ -126,12 +133,15 @@ export class Chat implements AfterViewChecked {
     if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
   }
 
-  handleFile(sender: string, files: FileMessage[]) {
+  handleFile(sender: string, files: any[]) {
     let tab = this.chatTabs.find(t => t.user === sender);
     if (!tab) {
       tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
       this.chatTabs.push(tab);
     }
+    files.forEach(()=>{
+      
+    })
     tab.messages.push({
       sender,
       receiver: sender,
@@ -145,6 +155,8 @@ export class Chat implements AfterViewChecked {
   }
 
   send(tab: ChatTab) {
+    const hasMessage = !!tab.newMessage?.trim();
+    const hasFiles = !!tab.pendingFiles && tab.pendingFiles.length > 0;
     // Multiple files + message
     if ((tab.newMessage?.trim() || tab.pendingFiles?.length > 0) && tab.pendingFiles?.length) {
       this.signalR.uploadChatFiles(this.loggedBy, tab.user, Array.from(tab.pendingFiles), tab.newMessage)
@@ -198,7 +210,8 @@ export class Chat implements AfterViewChecked {
 
   onFilesSelected(event: any, tab: ChatTab) {
     if (!event || !event.files?.length) return;
-    tab.pendingFiles = event.files;
+    //tab.pendingFiles = event.files;
+    tab.pendingFiles = [...event.files];
     tab.previewFiles = [];
     event.files.forEach((file: any) => {
       const reader = new FileReader();
