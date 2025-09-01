@@ -113,7 +113,7 @@ uploadChatFiles(sender: string, receiver: string, files: File[], message?: strin
   const formData = new FormData();
   files.forEach(f => formData.append('file', f));
   if(message) formData.append('message', message);
-  return this.http.post<FileMessage[]>(`${this.url}api/chat/upload/${receiver}?sender=${sender}`, formData);
+  return this.http.post<FileMessage[]>(`${this.url}api/chat/send/${receiver}?sender=${sender}`, formData);
 }
 
 onMessageUpdate(callback: (msg: ChatMessage) => void) {
