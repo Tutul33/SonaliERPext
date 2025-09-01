@@ -42,6 +42,21 @@ export class Chat implements AfterViewChecked {
     this.setLoggedUserInfo();
   }
 
+  loadMessages(tab: ChatTab, page: number) {
+    this.signalR.getMessages(this.loggedBy, tab.user, page, 20)
+      .subscribe(msgs => {
+        tab.messages = [...msgs, ...tab.messages]; // prepend older messages
+      });
+  }
+
+  onScroll(event: any, tab: ChatTab) {
+  const element = event.target;
+  if (element.scrollTop === 0) {
+    tab.page = (tab.page || 1) + 1; // next page
+    this.loadMessages(tab, tab.page);
+  }
+}
+
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
@@ -50,7 +65,7 @@ export class Chat implements AfterViewChecked {
     try {
       const el = this.chatContainers.toArray()[this.activeTabIndex]?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
-    } catch {}
+    } catch { }
   }
 
   toggleChat() {
@@ -185,7 +200,7 @@ export class Chat implements AfterViewChecked {
     if (!event || !event.files?.length) return;
     tab.pendingFiles = event.files;
     tab.previewFiles = [];
-    Array.from(event.files).forEach((file:any) => {
+    event.files.forEach((file: any) => {
       const reader = new FileReader();
       reader.onload = () => {
         tab.previewFiles?.push({
@@ -238,6 +253,6 @@ export class Chat implements AfterViewChecked {
     try {
       const fileType = file.fileName.split('.').pop() || '';
       this.signalR.download(fileType, file.fileUrl || file.fileName);
-    } catch {}
+    } catch { }
   }
 }

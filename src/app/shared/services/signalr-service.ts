@@ -119,4 +119,7 @@ uploadChatFiles(sender: string, receiver: string, files: File[], message?: strin
 onMessageUpdate(callback: (msg: ChatMessage) => void) {
   this.hubConnection.on('ReceiveUpdatedMessage', callback);
 }
+getMessages(user1: string, user2: string, page: number, pageSize: number): Observable<ChatMessage[]> {
+  return this.http.get<ChatMessage[]>(`${this.url}api/chat/messages/${user1}/${user2}?page=${page}&pageSize=${pageSize}`);
+}
 }

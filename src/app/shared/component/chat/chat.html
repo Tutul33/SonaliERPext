@@ -14,61 +14,78 @@
     <div class="chat-sidebar">
       <input placeholder="Search User" [(ngModel)]="searchUserObj" (keyup)="searchUser()" />
       <ul>
-        <li *ngFor="let u of activeUsers" (click)="openChat(u.userName)">
+        @for(u of activeUsers; track $index){
+        <li (click)="openChat(u.userName)">
           {{ u.userName }} <span [ngClass]="{'text-success': u.isOnline}">{{u.isOnline?'Online':'Offline'}}</span>
         </li>
+        }
       </ul>
     </div>
 
     <div class="chat-tabs">
       <p-tabs [(value)]="activeTabIndex" scrollable (valueChange)="onTabChange($event)">
         <p-tablist>
-          <p-tab *ngFor="let tab of chatTabs; let i=index" [value]="i">
-            <span>{{ tab.user }} <sup *ngIf="tab.totalUnread>0">{{ tab.totalUnread }}</sup></span>
+          @for(tab of chatTabs; track $index){
+          <p-tab [value]="$index">
+            <span>{{ tab.user }}
+              @if(tab.totalUnread>0){
+              <sup>{{ tab.totalUnread }}</sup>
+              }
+            </span>
             <span (click)="closeTab(tab)"><i class="bi bi-x"></i></span>
           </p-tab>
+          }
         </p-tablist>
 
         <p-tabpanels>
-          <p-tabpanel *ngFor="let tab of chatTabs; let i=index" [value]="i">
-            <div #chatMessagesContainer class="chat-messages">
-              <div *ngFor="let m of tab.messages" class="chat-message">
+          @for(tab of chatTabs;track $index){
+          <p-tabpanel [value]="$index">
+            <div #chatMessagesContainer class="chat-messages" (scroll)="onScroll($event, tab)">
+              @for(m of tab.messages;track $index){
+              <div class="chat-message">
                 <div class="message-content">
                   <b>{{ m.sender }}:</b>
-                  <span *ngIf="!m.editing">{{ m.text }}</span>
-                  <input *ngIf="m.editing" [(ngModel)]="m.text" />
-                  <button *ngIf="!m.editing" (click)="editMessage(tab,m)">Edit</button>
-                  <button *ngIf="m.editing" (click)="saveMessage(tab,m)">Save</button>
-                  <button *ngIf="m.editing" (click)="cancelEdit(m)">Cancel</button>
+                  @if(!m.editing){<span>{{ m.text }}</span>}
+                  @if(m.editing){<input [(ngModel)]="m.text" />}
+                  @if(!m.editing){<button (click)="editMessage(tab,m)">Edit</button>}
+                  @if(m.editing){<button (click)="saveMessage(tab,m)">Save</button>}
+                  @if(m.editing){<button (click)="cancelEdit(m)">Cancel</button>}
 
-                  <div *ngIf="m.files?.length">
-                    <div *ngFor="let f of m.files">
+                  @if(m.files?.length){
+                  <div>
+                    @for(f of m.files;track $index){
+                    <div>
                       <span>{{ f.fileName }}</span>
                       <a href="javascript:void(0)" (click)="deleteFile(tab,f)">Delete</a>
                     </div>
+                    }
                   </div>
+                  }
                 </div>
                 <div class="message-date">{{ m.sentDate | date:'shortTime' }}</div>
               </div>
-
-              <!-- Pending files preview -->
-              <div *ngIf="tab.previewFiles?.length">
-                <div *ngFor="let f of tab.previewFiles">
+              }
+              @if(tab.previewFiles?.length){
+              <div>
+                @for(f of tab.previewFiles;track $index){
+                <div>
                   <span>{{ f.fileName }}</span>
                   <a href="javascript:void(0)" (click)="deleteFile(tab,f)">Remove</a>
                 </div>
+                }
               </div>
+              }
             </div>
 
             <div class="chat-input">
               <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" />
               <p-fileUpload name="fileUpload" auto="false" multiple="true"
-                            accept=".png,.jpg,.jpeg,.doc,.docx,.pdf,.xls,.xlsx"
-                            (onSelect)="onFilesSelected($event, tab)">
+                accept=".png,.jpg,.jpeg,.doc,.docx,.pdf,.xls,.xlsx" (onSelect)="onFilesSelected($event, tab)">
               </p-fileUpload>
               <p-button (click)="send(tab)" severity="success"><i class="bi bi-arrow-right"></i></p-button>
             </div>
           </p-tabpanel>
+          }
         </p-tabpanels>
       </p-tabs>
     </div>
