@@ -29,7 +29,7 @@ export class Chat implements AfterViewChecked {
   activeTabIndex = 0;
   tempUserList: any;
   searchUserObj: string = '';
-  fileUrl: any = GlobalMethods.FileUrl()+'ChatFiles/';
+  fileUrl: any = GlobalMethods.FileUrl() + 'ChatFiles/';
 
   @ViewChildren('chatMessagesContainer') chatContainers!: QueryList<ElementRef>;
 
@@ -50,15 +50,15 @@ export class Chat implements AfterViewChecked {
   }
 
   onScroll(event: any, tab: ChatTab) {
-  const element = event.target;
-  if (element.scrollTop === 0) {
-    tab.page = (tab.page || 1) + 1; // next page
-    this.loadMessages(tab, tab.page);
+    const element = event.target;
+    if (element.scrollTop === 0) {
+      tab.page = (tab.page || 1) + 1; // next page
+      this.loadMessages(tab, tab.page);
+    }
   }
-}
 
   ngAfterViewChecked() {
-    this.scrollToBottom();
+   // this.scrollToBottom();
   }
 
   scrollToBottom() {
@@ -97,9 +97,21 @@ export class Chat implements AfterViewChecked {
         debugger
         this.handleMessage(sender, msg)
       });
-      this.signalR.onFile((sender, msg:any) => {
+      this.signalR.onUpdateMessage((sender, msg) => {
         debugger
-        this.handleFile(sender, msg.files)
+        this.updateMessage(sender, msg)
+      });
+      this.signalR.onDeleteMessage((sender, msg) => {
+        debugger
+        this.handleMessageDelete(sender, msg)
+      });
+      this.signalR.onFile((sender, msg: any) => {
+        debugger
+        this.handleFile(sender, msg)
+      });
+      this.signalR.onDeleteFile((sender, msg: any) => {
+        debugger
+        this.handleFileDelete(sender, msg)
       });
       this.signalR.onMessageUpdate((msg) => this.applyUpdatedMessage(msg));
       this.signalR.onActiveUsers(users => {
@@ -122,6 +134,29 @@ export class Chat implements AfterViewChecked {
     tab.messages.forEach(m => m.isRead = true);
   }
 
+  handleMessageDelete(sender: string, id: any) {
+    debugger
+    let tab = this.chatTabs.find(t => t.user === sender);
+    if (tab) {
+      tab.messages = tab.messages.filter(x => x.id != id);
+    }
+  }
+
+  updateMessage(sender: string, msg: any) {
+    try {
+      debugger
+      let tab = this.chatTabs.find(t => t.user === sender);
+      if (tab) {
+         const msgObj=tab.messages.find(x=>x.id==msg.id);
+         if(msgObj){
+            msgObj.text=msg.text;
+         }
+      }
+    } catch (error) {
+
+    }
+  }
+
   handleMessage(sender: string, msg: any) {
     debugger
     let tab = this.chatTabs.find(t => t.user === sender);
@@ -133,40 +168,49 @@ export class Chat implements AfterViewChecked {
     if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
   }
 
-  handleFile(sender: string, files: any[]) {
+
+
+  handleFile(sender: string, msg: any) {
     let tab = this.chatTabs.find(t => t.user === sender);
     if (!tab) {
       tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
       this.chatTabs.push(tab);
     }
-    files.forEach(()=>{
-      
-    })
+
     tab.messages.push({
+      id: msg.id,
       sender,
       receiver: sender,
-      text: `Sent ${files.length} file(s)`,
+      text: msg.text,
       isRead: false,
-      files,
+      files: msg.files,
       sentDate: new Date(),
       tag: EntityState.Added
     });
     if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
   }
 
+  handleFileDelete(sender: string, id: any) {
+    let tab = this.chatTabs.find(t => t.user === sender);
+    if (tab) {
+      tab.messages.forEach(m => m.files = m.files?.filter(f => f.id !== id));
+    }
+  }
+
+
   send(tab: ChatTab) {
-    const hasMessage = !!tab.newMessage?.trim();
-    const hasFiles = !!tab.pendingFiles && tab.pendingFiles.length > 0;
     // Multiple files + message
     if ((tab.newMessage?.trim() || tab.pendingFiles?.length > 0) && tab.pendingFiles?.length) {
       this.signalR.uploadChatFiles(this.loggedBy, tab.user, Array.from(tab.pendingFiles), tab.newMessage)
         .subscribe({
-          next: (fileMessages) => {
+          next: (res: any) => {
+            const fileMessages = res?.data || res;
             const msg: ChatMessage = {
+              id: fileMessages.id,
               sender: this.loggedBy,
               receiver: tab.user,
-              text: tab.newMessage || `Sent ${fileMessages.length} files`,
-              files: fileMessages,
+              text: tab.newMessage || `Sent ${fileMessages?.files?.length} files`,
+              files: fileMessages?.files,
               isRead: true,
               sentDate: new Date(),
               tag: EntityState.Added
@@ -228,9 +272,9 @@ export class Chat implements AfterViewChecked {
     });
   }
 
-  deleteFile(tab: ChatTab, file: FileMessage) {
+  deleteFile(tab: ChatTab, file: FileMessage, m?: any) {
     if (file.id) {
-      this.signalR.deleteFile(file.id).subscribe(() => {
+      this.signalR.deleteFile(this.loggedBy, m.receiver, file.id).subscribe(() => {
         tab.messages.forEach(m => m.files = m.files?.filter(f => f.id !== file.id));
       });
     } else {
@@ -241,6 +285,7 @@ export class Chat implements AfterViewChecked {
 
   editMessage(tab: ChatTab, msg: ChatMessage) {
     msg.editing = true;
+    msg.tag = EntityState.Modified;
   }
 
   saveMessage(tab: ChatTab, msg: ChatMessage) {

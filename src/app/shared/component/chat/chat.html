@@ -45,18 +45,26 @@
               <div class="chat-message">
                 <div class="message-content">
                   <b>{{ m.sender }}:</b>
-                  @if(!(m.tag==3)){<span>{{ m.text }}</span>}
-                  @if(m.tag==3){<input [(ngModel)]="m.text" />}
-                  @if(!(m.tag==3)){<button (click)="editMessage(tab,m)">Edit</button>}
-                  @if(m.tag==3){<button (click)="saveMessage(tab,m)">Save</button>}
-                  @if(m.tag==3){<button (click)="cancelEdit(m)">Cancel</button>}
-
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      @if(!(m.editing)){<span>{{ m.text }}</span>}
+                      @if(m.editing){<input [(ngModel)]="m.text" />}
+                    </div>
+                    <div>
+                      @if(loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i class="bi bi-trash3-fill text-danger"></i></span>}
+                      @if(!(m.editing) && loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i class="bi bi-pencil"></i></span>}
+                      @if(m.editing){<span (click)="saveMessage(tab,m)"><i class="bi bi-floppy-fill text-success"></i></span>}
+                      @if(m.editing){<span (click)="cancelEdit(m)" class="ms-2"><i class="bi bi-x text-warning"></i></span>}
+                    </div>
+                  </div>
                   @if(m.files?.length){
                   <div>
                     @for(f of m.files;track $index){
                     <div>
                       <p-image [src]="fileUrl+f.fileUrl" alt="Image" width="40px" height="40px" [preview]="true" />
-                      <a href="javascript:void(0)" (click)="deleteFile(tab,f)">Delete</a>
+                      @if(loggedBy==m.sender){
+                      <a href="javascript:void(0)" (click)="deleteFile(tab,f,m)" class="ms-2"><i class="bi bi-trash3-fill text-danger"></i></a>
+                      }
                     </div>
                     }
                   </div>

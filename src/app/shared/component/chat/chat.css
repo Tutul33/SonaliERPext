@@ -115,6 +115,7 @@
   gap: 5px;
   word-break: break-word;
   scroll-behavior: smooth;   /* smooth scrolling when new messages added */
+  height: 280px;
 }
 
 .chat-input {

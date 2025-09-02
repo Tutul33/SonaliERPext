@@ -53,6 +53,18 @@ export class SignalRService {
     this.hubConnection.on('ReceiveFile', callback);
   }
 
+  onDeleteMessage(callback: (fromUser: string, file: any) => void) {
+    this.hubConnection.on('MessageDeleted', callback);
+  }
+
+  onDeleteFile(callback: (fromUser: string, file: any) => void) {
+    this.hubConnection.on('FileDeleted', callback);
+  }
+  
+  onUpdateMessage(callback: (fromUser: string, msg: any) => void) {
+    this.hubConnection.on('MessageUpdated', callback);
+  }
+
   onActiveUsers(callback: (users: string[]) => void) {
     this.hubConnection.on('ActiveUsers', callback);
   }
@@ -63,16 +75,6 @@ export class SignalRService {
       url
     );
   }
-  
-  // uploadChatFile(sender: string, receiver: string, file: File,messages?:string): Observable<FileMessage> {
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   if(messages){
-  //     formData.append('message', messages);
-  //   }
-  //   const url = `${this.url}api/chat/upload/${receiver}?sender=${sender}`;
-  //   return this.http.post<FileMessage>(url, formData);
-  // }
 
   downloadReport(fileType: string, fileName: string) {
     try {
@@ -102,24 +104,24 @@ export class SignalRService {
   }
 
   updateMessage(msg: ChatMessage): Observable<ChatMessage> {
-  return this.http.put<ChatMessage>(`${this.url}api/chat/update-message`, msg);
-}
+    return this.http.put<ChatMessage>(`${this.url}api/chat/update-message`, msg);
+  }
 
-deleteFile(fileId: number): Observable<any> {
-  return this.http.delete(`${this.url}api/chat/delete-file/${fileId}`);
-}
+  deleteFile(sender: string, receiver: string, fileId: number): Observable<any> {
+    return this.http.delete(`${this.url}api/chat/delete-file/${sender}/${receiver}/${fileId}`);
+  }
 
-uploadChatFiles(sender: string, receiver: string, files: File[], message?: string): Observable<FileMessage[]> {
-  const formData = new FormData();
-  files.forEach(f => formData.append('files', f));
-  if(message) formData.append('message', message);
-  return this.http.post<FileMessage[]>(`${this.url}api/chat/send/${receiver}?sender=${sender}`, formData);
-}
+  uploadChatFiles(sender: string, receiver: string, files: File[], message?: string): Observable<FileMessage[]> {
+    const formData = new FormData();
+    files.forEach(f => formData.append('files', f));
+    if (message) formData.append('message', message);
+    return this.http.post<FileMessage[]>(`${this.url}api/chat/send/${receiver}?sender=${sender}`, formData);
+  }
 
-onMessageUpdate(callback: (msg: ChatMessage) => void) {
-  this.hubConnection.on('ReceiveUpdatedMessage', callback);
-}
-getMessages(user1: string, user2: string, page: number, pageSize: number): Observable<ChatMessage[]> {
-  return this.http.get<ChatMessage[]>(`${this.url}api/chat/messages/${user1}/${user2}?page=${page}&pageSize=${pageSize}`);
-}
+  onMessageUpdate(callback: (msg: ChatMessage) => void) {
+    this.hubConnection.on('ReceiveUpdatedMessage', callback);
+  }
+  getMessages(user1: string, user2: string, page: number, pageSize: number): Observable<ChatMessage[]> {
+    return this.http.get<ChatMessage[]>(`${this.url}api/chat/messages/${user1}/${user2}?page=${page}&pageSize=${pageSize}`);
+  }
 }
