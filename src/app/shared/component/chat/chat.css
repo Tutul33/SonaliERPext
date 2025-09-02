@@ -177,14 +177,14 @@
   background-color: #d3d3d3; /* gray */
 }
 
-.preview-files {
+.uploaded-files {
   display: flex;
   flex-wrap: wrap;       /* allow wrapping to new row if many files */
   gap: 8px;              /* space between previews */
   margin-top: 5px;
 }
 
-.preview-item {
+.uploaded-item {
   display: flex;
   align-items: center;
   gap: 4px;

@@ -68,9 +68,9 @@
                     </div>
                   </div>
                   @if(m.files?.length){
-                  <div class="preview-files">
+                  <div class="uploaded-files">
                     @for(f of m.files;track $index){
-                    <div class="preview-item">
+                    <div class="uploaded-item">
                       <p-image [src]="fileUrl+f.fileUrl" alt="Image" width="40px" height="40px" [preview]="true" />
                       @if(loggedBy==m.sender){
                       <a href="javascript:void(0)" (click)="deleteFile(tab,f,m)" class="ms-2"><i
@@ -85,9 +85,9 @@
               </div>
               }
               @if(tab.previewFiles?.length){
-              <div class="preview-files">
+              <div class="uploaded-files">
                 @for(f of tab.previewFiles;track $index){
-                <div class="preview-item">
+                <div class="uploaded-item">
                   @if(f.fileType.startsWith('image/')){
                   <ng-container>
                     <p-image [src]="f.fileData" alt="{{f.fileName}}" width="40px" height="40px" [preview]="true">
