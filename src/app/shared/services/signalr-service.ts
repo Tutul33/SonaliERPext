@@ -33,17 +33,7 @@ export class SignalRService {
     }
   }
 
-  sendPrivateMessage(sender: string, receiver: string, message: string) {
-    if (!this.isConnected) return;
-    this.hubConnection.invoke('SendPrivateMessage', sender, receiver, message);
-  }
-  // New method to send files
-  sendPrivateFile(sender: string, receiver: string, file: FileMessage) {
-    if (!this.isConnected) return;
-    this.hubConnection.invoke('SendPrivateFile', sender, receiver, file)
-      .catch(err => console.error('Error sending file via SignalR:', err));
-  }
-
+  
   onMessage(callback: (fromUser: string, message: any) => void) {
     this.hubConnection.on('ReceiveMessage', callback);
   }
@@ -60,7 +50,7 @@ export class SignalRService {
   onDeleteFile(callback: (fromUser: string, file: any) => void) {
     this.hubConnection.on('FileDeleted', callback);
   }
-  
+
   onUpdateMessage(callback: (fromUser: string, msg: any) => void) {
     this.hubConnection.on('MessageUpdated', callback);
   }
@@ -113,14 +103,12 @@ export class SignalRService {
 
   uploadChatFiles(sender: string, receiver: string, files: File[], message?: string): Observable<FileMessage[]> {
     const formData = new FormData();
-    files.forEach(f => formData.append('files', f));
+    if (files && files.length > 0)
+      files.forEach(f => formData.append('files', f));
     if (message) formData.append('message', message);
     return this.http.post<FileMessage[]>(`${this.url}api/chat/send/${receiver}?sender=${sender}`, formData);
   }
-
-  onMessageUpdate(callback: (msg: ChatMessage) => void) {
-    this.hubConnection.on('ReceiveUpdatedMessage', callback);
-  }
+  
   getMessages(user1: string, user2: string, page: number, pageSize: number): Observable<ChatMessage[]> {
     return this.http.get<ChatMessage[]>(`${this.url}api/chat/messages/${user1}/${user2}?page=${page}&pageSize=${pageSize}`);
   }

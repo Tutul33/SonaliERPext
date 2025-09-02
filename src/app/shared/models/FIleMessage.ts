@@ -4,7 +4,7 @@ export interface ChatTab {
   newMessage: string;
   totalUnread: number;
   pendingFiles?: any;
-  previewFiles?: FileMessage[];
+  previewFiles?: any[];
   page?:number;
 }
 export interface ChatMessage {

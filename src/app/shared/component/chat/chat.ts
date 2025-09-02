@@ -1,16 +1,17 @@
-import { AfterViewChecked, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { SignalRService } from '../../services/signalr-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from "primeng/button";
 import { TabsModule } from 'primeng/tabs';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ImageModule } from 'primeng/image';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../store/auth.selectors';
 import { Observable } from 'rxjs';
 import { ChatTab, FileMessage, ChatMessage } from '../../models/FIleMessage';
 import { EntityState, GlobalMethods } from '../../models/javascriptMethods';
+import { InformationService } from '../../services/information-service';
 
 @Component({
   selector: 'app-chat',
@@ -30,10 +31,10 @@ export class Chat implements AfterViewChecked {
   tempUserList: any;
   searchUserObj: string = '';
   fileUrl: any = GlobalMethods.FileUrl() + 'ChatFiles/';
-
+  @ViewChild('fileUploader') fileUploader!: FileUpload;
   @ViewChildren('chatMessagesContainer') chatContainers!: QueryList<ElementRef>;
 
-  constructor(private store: Store, private signalR: SignalRService) {
+  constructor(private store: Store, private signalR: SignalRService, private infoSvc:InformationService) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
   }
 
@@ -50,22 +51,28 @@ export class Chat implements AfterViewChecked {
   }
 
   onScroll(event: any, tab: ChatTab) {
-    const element = event.target;
-    if (element.scrollTop === 0) {
-      tab.page = (tab.page || 1) + 1; // next page
-      this.loadMessages(tab, tab.page);
+    try {
+      const element = event.target;
+      if (element.scrollTop === 0) {
+        tab.page = (tab.page || 1) + 1; // next page
+        this.loadMessages(tab, tab.page);
+      }
+    } catch (error) {
+      this.infoSvc.showErrorMsg(error);
     }
   }
 
   ngAfterViewChecked() {
-   // this.scrollToBottom();
+    // this.scrollToBottom();
   }
 
   scrollToBottom() {
     try {
       const el = this.chatContainers.toArray()[this.activeTabIndex]?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
-    } catch { }
+    } catch (error){ 
+      this.infoSvc.showErrorMsg(error);
+    }
   }
 
   toggleChat() {
@@ -73,12 +80,16 @@ export class Chat implements AfterViewChecked {
   }
 
   getFinanceAndAccountUsers() {
-    this.signalR.GetFinanceAndAccountUsers().subscribe(res => {
+    try {
+      this.signalR.GetFinanceAndAccountUsers().subscribe(res => {
       const list = res?.data?.list ?? [];
       this.activeUsers = list.filter(x => x.userName !== this.loggedBy)
         .map(u => ({ userName: u.userName, isOnline: false }));
       this.tempUserList = [...this.activeUsers];
     });
+    } catch (error) {
+      this.infoSvc.showErrorMsg(error);
+    }
   }
 
   searchUser() {
@@ -93,10 +104,6 @@ export class Chat implements AfterViewChecked {
       this.loggedBy = user.userName;
       this.signalR.startConnection(this.loggedBy);
 
-      this.signalR.onMessage((sender, msg) => {
-        debugger
-        this.handleMessage(sender, msg)
-      });
       this.signalR.onUpdateMessage((sender, msg) => {
         debugger
         this.updateMessage(sender, msg)
@@ -113,7 +120,6 @@ export class Chat implements AfterViewChecked {
         debugger
         this.handleFileDelete(sender, msg)
       });
-      this.signalR.onMessageUpdate((msg) => this.applyUpdatedMessage(msg));
       this.signalR.onActiveUsers(users => {
         const activeUserNames = users.filter(u => u !== this.loggedBy);
         this.activeUsers.forEach(u => u.isOnline = activeUserNames.includes(u.userName));
@@ -147,28 +153,15 @@ export class Chat implements AfterViewChecked {
       debugger
       let tab = this.chatTabs.find(t => t.user === sender);
       if (tab) {
-         const msgObj=tab.messages.find(x=>x.id==msg.id);
-         if(msgObj){
-            msgObj.text=msg.text;
-         }
+        const msgObj = tab.messages.find(x => x.id == msg.id);
+        if (msgObj) {
+          msgObj.text = msg.text;
+        }
       }
     } catch (error) {
 
     }
   }
-
-  handleMessage(sender: string, msg: any) {
-    debugger
-    let tab = this.chatTabs.find(t => t.user === sender);
-    if (!tab) {
-      tab = { user: sender, messages: [], newMessage: '', totalUnread: 0 };
-      this.chatTabs.push(tab);
-    }
-    tab.messages.push(msg);
-    if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
-  }
-
-
 
   handleFile(sender: string, msg: any) {
     let tab = this.chatTabs.find(t => t.user === sender);
@@ -188,6 +181,7 @@ export class Chat implements AfterViewChecked {
       tag: EntityState.Added
     });
     if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
+     setTimeout(() => this.scrollToBottom(), 50);
   }
 
   handleFileDelete(sender: string, id: any) {
@@ -200,8 +194,8 @@ export class Chat implements AfterViewChecked {
 
   send(tab: ChatTab) {
     // Multiple files + message
-    if ((tab.newMessage?.trim() || tab.pendingFiles?.length > 0) && tab.pendingFiles?.length) {
-      this.signalR.uploadChatFiles(this.loggedBy, tab.user, Array.from(tab.pendingFiles), tab.newMessage)
+    if (tab.newMessage?.trim() || tab.pendingFiles?.length > 0) {
+      this.signalR.uploadChatFiles(this.loggedBy, tab.user, tab.pendingFiles, tab.newMessage)
         .subscribe({
           next: (res: any) => {
             const fileMessages = res?.data || res;
@@ -219,24 +213,12 @@ export class Chat implements AfterViewChecked {
             tab.pendingFiles = undefined;
             tab.previewFiles = undefined;
             tab.newMessage = '';
+            setTimeout(() => this.scrollToBottom(), 50);
           },
           error: err => console.error(err)
         });
     }
-    // Text only
-    else if (tab.newMessage?.trim()) {
-      const msg: ChatMessage = {
-        sender: this.loggedBy,
-        receiver: tab.user,
-        text: tab.newMessage,
-        isRead: true,
-        sentDate: new Date(),
-        tag: EntityState.Added
-      };
-      this.signalR.sendPrivateMessage(this.loggedBy, tab.user, tab.newMessage);
-      tab.messages.push(msg);
-      tab.newMessage = '';
-    }
+
   }
 
   closeTab(tab: ChatTab) {
@@ -254,12 +236,13 @@ export class Chat implements AfterViewChecked {
 
   onFilesSelected(event: any, tab: ChatTab) {
     if (!event || !event.files?.length) return;
-    //tab.pendingFiles = event.files;
-    tab.pendingFiles = [...event.files];
-    tab.previewFiles = [];
-    event.files.forEach((file: any) => {
+
+    tab.pendingFiles = [...tab?.pendingFiles || []];
+    tab.previewFiles = [...tab?.previewFiles || []];
+    Array.from(event.files).forEach((file: any) => {
       const reader = new FileReader();
       reader.onload = () => {
+        tab.pendingFiles.push(file);
         tab.previewFiles?.push({
           fileName: file.name,
           fileType: file.type,
@@ -270,6 +253,7 @@ export class Chat implements AfterViewChecked {
       };
       reader.readAsDataURL(file);
     });
+    setTimeout(() => this.scrollToBottom(), 50);
   }
 
   deleteFile(tab: ChatTab, file: FileMessage, m?: any) {
@@ -298,13 +282,6 @@ export class Chat implements AfterViewChecked {
 
   cancelEdit(msg: ChatMessage) {
     msg.editing = false;
-  }
-
-  applyUpdatedMessage(msg: ChatMessage) {
-    const tab = this.chatTabs.find(t => t.user === msg.receiver || t.user === msg.sender);
-    if (!tab) return;
-    const message = tab.messages.find(m => m.id === msg.id);
-    if (message) Object.assign(message, msg);
   }
 
   download(file: FileMessage) {

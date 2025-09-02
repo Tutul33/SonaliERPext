@@ -12,14 +12,20 @@
 
   <div class="chat-body">
     <div class="chat-sidebar">
-      <input placeholder="Search User" [(ngModel)]="searchUserObj" (keyup)="searchUser()" />
-      <ul>
-        @for(u of activeUsers; track $index){
-        <li (click)="openChat(u.userName)">
-          {{ u.userName }} <span [ngClass]="{'text-success': u.isOnline}">{{u.isOnline?'Online':'Offline'}}</span>
-        </li>
-        }
-      </ul>
+      <div class="chat-sidebar-header">
+        <input placeholder="Search User" [(ngModel)]="searchUserObj" (keyup)="searchUser()" />
+      </div>
+
+      <div class="chat-sidebar-list">
+        <ul>
+          @for(u of activeUsers; track $index){
+          <li (click)="openChat(u.userName)">
+            <span class="user-status" [ngClass]="{'online': u.isOnline, 'offline': !u.isOnline}"></span>
+            {{ u.userName }}
+          </li>
+          }
+        </ul>
+      </div>
     </div>
 
     <div class="chat-tabs">
@@ -51,19 +57,24 @@
                       @if(m.editing){<input [(ngModel)]="m.text" />}
                     </div>
                     <div>
-                      @if(loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i class="bi bi-trash3-fill text-danger"></i></span>}
-                      @if(!(m.editing) && loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i class="bi bi-pencil"></i></span>}
-                      @if(m.editing){<span (click)="saveMessage(tab,m)"><i class="bi bi-floppy-fill text-success"></i></span>}
-                      @if(m.editing){<span (click)="cancelEdit(m)" class="ms-2"><i class="bi bi-x text-warning"></i></span>}
+                      @if(loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i
+                          class="bi bi-trash3-fill text-danger"></i></span>}
+                      @if(!(m.editing) && loggedBy==m.sender){<span (click)="editMessage(tab,m)"><i
+                          class="bi bi-pencil"></i></span>}
+                      @if(m.editing){<span (click)="saveMessage(tab,m)"><i
+                          class="bi bi-floppy-fill text-success"></i></span>}
+                      @if(m.editing){<span (click)="cancelEdit(m)" class="ms-2"><i
+                          class="bi bi-x text-warning"></i></span>}
                     </div>
                   </div>
                   @if(m.files?.length){
-                  <div>
+                  <div class="preview-files">
                     @for(f of m.files;track $index){
-                    <div>
+                    <div class="preview-item">
                       <p-image [src]="fileUrl+f.fileUrl" alt="Image" width="40px" height="40px" [preview]="true" />
                       @if(loggedBy==m.sender){
-                      <a href="javascript:void(0)" (click)="deleteFile(tab,f,m)" class="ms-2"><i class="bi bi-trash3-fill text-danger"></i></a>
+                      <a href="javascript:void(0)" (click)="deleteFile(tab,f,m)" class="ms-2"><i
+                          class="bi bi-trash3-fill text-danger"></i></a>
                       }
                     </div>
                     }
@@ -74,11 +85,15 @@
               </div>
               }
               @if(tab.previewFiles?.length){
-              <div>
+              <div class="preview-files">
                 @for(f of tab.previewFiles;track $index){
-                <div>
-                  <span>{{ f.fileName }}</span>
-                  <a href="javascript:void(0)" (click)="deleteFile(tab,f)">Remove</a>
+                <div class="preview-item">
+                  <ng-container *ngIf="f.fileType.startsWith('image/')">
+                    <p-image [src]="f.fileData" alt="{{f.fileName}}" width="40px" height="40px" [preview]="true">
+                    </p-image>
+                  </ng-container>
+                  <span *ngIf="!f.fileType.startsWith('image/')">{{ f.fileName }}</span>
+                  <a href="javascript:void(0)" (click)="deleteFile(tab,f)"><i class="bi bi-x"></i></a>
                 </div>
                 }
               </div>
@@ -86,10 +101,14 @@
             </div>
 
             <div class="chat-input">
-              <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" />
-              <p-fileUpload name="fileUpload" auto="false" multiple="true"
+              <!-- <input pInputText [(ngModel)]="tab.newMessage" placeholder="Type a message" (keyup.enter)="send(tab)" /> -->
+              <textarea rows="3" cols="70" pTextarea [(ngModel)]="tab.newMessage" placeholder="Type a message"
+                (keyup.enter)="send(tab)"></textarea>
+              <p-fileUpload name="fileUpload" auto="false" multiple="true" chooseLabel="Attchment" mode="basic"
+                uploadLabel="Upload" cancelLabel="Clear" showUploadButton="false" showCancelButton="true"
                 accept=".png,.jpg,.jpeg,.doc,.docx,.pdf,.xls,.xlsx" (onSelect)="onFilesSelected($event, tab)">
               </p-fileUpload>
+
               <p-button (click)="send(tab)" severity="success"><i class="bi bi-arrow-right"></i></p-button>
             </div>
           </p-tabpanel>
