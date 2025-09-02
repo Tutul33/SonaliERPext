@@ -189,3 +189,36 @@
   align-items: center;
   gap: 4px;
 }
+
+.chat-preview-overlay {
+  position: absolute;
+  top: 50px;           /* below header */
+  left: 220px;         /* after sidebar */
+  right: 10px;
+  bottom: 60px;        /* above input */
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 1100;
+}
+
+.chat-preview-overlay img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 6px;
+}
+
+.chat-preview-overlay .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.p-fileupload-basic .p-fileupload-filename {
+  display: none !important;
+}

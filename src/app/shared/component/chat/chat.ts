@@ -12,10 +12,11 @@ import { Observable } from 'rxjs';
 import { ChatTab, FileMessage, ChatMessage } from '../../models/FIleMessage';
 import { EntityState, GlobalMethods } from '../../models/javascriptMethods';
 import { InformationService } from '../../services/information-service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-chat',
-  imports: [CommonModule, FormsModule, Button, TabsModule, FileUploadModule, ImageModule],
+  imports: [CommonModule, FormsModule, Button, TabsModule, FileUploadModule, ImageModule, DialogModule],
   templateUrl: './chat.html',
   styleUrls: ['./chat.css']
 })
@@ -24,7 +25,8 @@ export class Chat implements AfterViewChecked {
   loggedUser$: Observable<any | null>;
   loggedBy: string = '';
   chatVisible = false;
-
+  previewVisible = false;
+  previewImage: string | null = null;
   activeUsers: any[] = [];
   chatTabs: ChatTab[] = [];
   activeTabIndex = 0;
@@ -34,13 +36,13 @@ export class Chat implements AfterViewChecked {
   @ViewChild('fileUploader') fileUploader!: FileUpload;
   @ViewChildren('chatMessagesContainer') chatContainers!: QueryList<ElementRef>;
 
-  constructor(private store: Store, private signalR: SignalRService, private infoSvc:InformationService) {
+  constructor(private store: Store, private signalR: SignalRService, private infoSvc: InformationService) {
     this.loggedUser$ = this.store.select(selectCurrentUser);
   }
 
   ngOnInit() {
     this.getFinanceAndAccountUsers();
-    this.setLoggedUserInfo();
+    this.setLoggedUserInfo();    
   }
 
   loadMessages(tab: ChatTab, page: number) {
@@ -70,7 +72,7 @@ export class Chat implements AfterViewChecked {
     try {
       const el = this.chatContainers.toArray()[this.activeTabIndex]?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
-    } catch (error){ 
+    } catch (error) {
       this.infoSvc.showErrorMsg(error);
     }
   }
@@ -82,11 +84,11 @@ export class Chat implements AfterViewChecked {
   getFinanceAndAccountUsers() {
     try {
       this.signalR.GetFinanceAndAccountUsers().subscribe(res => {
-      const list = res?.data?.list ?? [];
-      this.activeUsers = list.filter(x => x.userName !== this.loggedBy)
-        .map(u => ({ userName: u.userName, isOnline: false }));
-      this.tempUserList = [...this.activeUsers];
-    });
+        const list = res?.data?.list ?? [];
+        this.activeUsers = list.filter(x => x.userName !== this.loggedBy)
+          .map(u => ({ userName: u.userName, isOnline: false }));
+        this.tempUserList = [...this.activeUsers];
+      });
     } catch (error) {
       this.infoSvc.showErrorMsg(error);
     }
@@ -133,6 +135,7 @@ export class Chat implements AfterViewChecked {
       tab = { user, messages: [], newMessage: '', totalUnread: 0 };
       this.chatTabs.push(tab);
       setTimeout(() => this.activeTabIndex = this.chatTabs.length - 1);
+      this.loadMessages(tab,1);
     } else {
       this.activeTabIndex = this.chatTabs.indexOf(tab);
     }
@@ -181,7 +184,7 @@ export class Chat implements AfterViewChecked {
       tag: EntityState.Added
     });
     if (this.chatTabs.indexOf(tab) !== this.activeTabIndex) tab.totalUnread++;
-     setTimeout(() => this.scrollToBottom(), 50);
+    setTimeout(() => this.scrollToBottom(), 50);
   }
 
   handleFileDelete(sender: string, id: any) {
@@ -203,7 +206,7 @@ export class Chat implements AfterViewChecked {
               id: fileMessages.id,
               sender: this.loggedBy,
               receiver: tab.user,
-              text: tab.newMessage || `Sent ${fileMessages?.files?.length} files`,
+              text: tab.newMessage,
               files: fileMessages?.files,
               isRead: true,
               sentDate: new Date(),
@@ -289,5 +292,15 @@ export class Chat implements AfterViewChecked {
       const fileType = file.fileName.split('.').pop() || '';
       this.signalR.download(fileType, file.fileUrl || file.fileName);
     } catch { }
+  }
+
+  openPreview(src: string) {
+    this.previewImage = src;
+    this.previewVisible = true;
+  }
+
+  onDialogClose() {
+    this.previewVisible = false;
+    this.previewImage = null; // optional: clear image
   }
 }
