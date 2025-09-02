@@ -88,11 +88,15 @@
               <div class="preview-files">
                 @for(f of tab.previewFiles;track $index){
                 <div class="preview-item">
-                  <ng-container *ngIf="f.fileType.startsWith('image/')">
+                  @if(f.fileType.startsWith('image/')){
+                  <ng-container>
                     <p-image [src]="f.fileData" alt="{{f.fileName}}" width="40px" height="40px" [preview]="true">
                     </p-image>
                   </ng-container>
-                  <span *ngIf="!f.fileType.startsWith('image/')">{{ f.fileName }}</span>
+                  }
+                  @if(!f.fileType.startsWith('image/')){
+                  <span >{{ f.fileName }}</span>
+                  }
                   <a href="javascript:void(0)" (click)="deleteFile(tab,f)"><i class="bi bi-x"></i></a>
                 </div>
                 }
