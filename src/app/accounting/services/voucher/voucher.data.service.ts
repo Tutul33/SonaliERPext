@@ -38,9 +38,9 @@ export class VoucherDataService {
       );
    }
 
-   getVoucherDetailByVoucherNo(voucherNo: string): Observable<any> {   
+   getVoucherDetailByVoucherNo(voucherNo: string,entryDate: Date): Observable<any> {   
       return this.http.get<any>(
-         this.url + `GetVoucherDetailsByVoucherNo?voucherNo=` + voucherNo
+         this.url + `GetVoucherDetailsByVoucherNo?voucherNo=` + voucherNo + '&entryDate=' + entryDate
       );
    }
 

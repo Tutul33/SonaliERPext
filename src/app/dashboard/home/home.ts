@@ -20,17 +20,17 @@ export class Home {
   years: any[] = [];
   items: any[] = [
     {
-      label: 'check-pending',
+      label: 'CheckPending',
       title: 'Check Pending',
       hasAccess: false,
     },
     {
-      label: 'approval-pending',
+      label: 'ApprovalPending',
       title: 'Approval Pending',
       hasAccess: false,
     },
     {
-      label: 'referral-pending',
+      label: 'ReferralPending',
       title: 'Referral Pending',
       hasAccess: false,
     }

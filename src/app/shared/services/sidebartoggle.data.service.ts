@@ -26,9 +26,9 @@ export class SidebartoggleDataService {
   //       { label: 'User Role', hasAccess: false, route: '/app/admin/user-role' }
   //     ]
   //   },
-  //   { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
-  //   { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
-  //   { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
+  //   { label: 'Check Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'CheckPending' } },
+  //   { label: 'Approval Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'ApprovalPending' } },
+  //   { label: 'Referral Pending', hasAccess: false, route: '/app/accounting/voucher-approval', queryParam: { status: 'ReferralPending' } },
   //   {
   //     label: 'Demo',
   //     route: '/app/demo',
@@ -55,9 +55,9 @@ public menuItemsSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([
         { label: 'User Role', hasAccess: false, route: '/admin/user-role' }
       ]
     },
-    { label: 'Check Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'check-pending' } },
-    { label: 'Approval Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'approval-pending' } },
-    { label: 'Referral Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'referral-pending' } },
+    { label: 'Check Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'CheckPending' } },
+    { label: 'Approval Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'ApprovalPending' } },
+    { label: 'Referral Pending', hasAccess: false, route: '/accounting/voucher-approval', queryParam: { status: 'ReferralPending' } },
     {
       label: 'Demo',
       route: '/demo',

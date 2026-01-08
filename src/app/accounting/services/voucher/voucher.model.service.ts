@@ -76,7 +76,15 @@ export class VoucherModelService {
         voucherItem.setModifyTag();
         this.voucherModel.voucherItems.push(voucherItem);
       });
-      this.voucherModel.entryDate = new Date(data[0].entryDate)
+      debugger;
+      const sqlDate = data[0].entryDate;
+      const parts = sqlDate.split('T')[0].split('-'); // ["2026", "01", "04"]
+      this.voucherModel.entryDate = new Date(
+          +parts[0], // year
+          +parts[1] - 1, // month 0-based
+          +parts[2]  // day
+      );
+      //this.voucherModel.entryDate = new Date(data[0].entryDate)
       if ((data[0].chkDt))
         this.voucherModel.chkDt = new Date(data[0].chkDt)
       this.voucherModel.totalDebit = this.voucherModel.voucherItems.reduce((acc, i) => { return acc + i.dAmount }, 0);
@@ -143,15 +151,16 @@ export class VoucherModelService {
   prepareBeforeSave() {
     try {
       let data = [];
-      if (this.status == 'check-pending' || this.status == 'approval-pending') {
+      if (this.status == 'CheckPending' || this.status == 'ApprovalPending') {
         this.voucherModel.voucherItems.forEach((item) => {
           data.push({
             id: item.id,
-            checkedBy: this.status == 'check-pending' ? this.loggedBy : '',
-            approvedBy: this.status == 'approval-pending' ? this.loggedBy : ''
+            checkedBy: this.status == 'CheckPending' ? this.loggedBy : '',
+            approvedBy: this.status == 'ApprovalPending' ? this.loggedBy : '',
+            entryDate: item.entryDate
           });
         });
-      } if (this.status == 'referral-pending') {
+      } if (this.status == 'ReferralPending') {
         const cleanedVoucherItems = this.voucherModel.voucherItems.map(({
           chartOfAccountList,
           subLedgerList,

@@ -502,7 +502,8 @@ export class VoucherApproval {
 
   getVoucherDetails(voucher) {
     try {
-      this.dataSvc.getVoucherDetailByVoucherNo(voucher.voucherNo).subscribe({
+      debugger
+      this.dataSvc.getVoucherDetailByVoucherNo(voucher.voucherNo,voucher.entryDate).subscribe({
         next: (response: any) => {
           const res=response.data;
           if (res) {console.log(res)
@@ -545,7 +546,7 @@ export class VoucherApproval {
   updateVoucher() {
     try {
       const data = this.modelSvc.prepareBeforeSave();
-      if (this.modelSvc.status == 'check-pending' || this.modelSvc.status == 'approval-pending') {
+      if (this.modelSvc.status == 'CheckPending' || this.modelSvc.status == 'ApprovalPending') {
         this.dataSvc.UpdateVoucherCheckApprove(data).subscribe({
           next: (response: any) => {
           const res=response.data;

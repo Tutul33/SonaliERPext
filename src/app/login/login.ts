@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DividerModule } from 'primeng/divider';
 import { ButtonModule } from 'primeng/button';
@@ -26,7 +26,7 @@ import { LoadingService } from '../shared/services/loading-service';
 })
 export class Login implements OnInit {
   loginForm!: FormGroup;
-
+  status:string='';
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -34,7 +34,8 @@ export class Login implements OnInit {
     private dataSvc: LoginDataService,
     private sidebar: SidebartoggleDataService,
     private msgSvc: InformationService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -42,6 +43,23 @@ export class Login implements OnInit {
       userName: ['', Validators.required],
       password: ['', Validators.required]
     });
+
+    this.route.queryParams.subscribe(params => {
+    const userName = params['userName'];
+    const password = params['password'];
+    const status = params['status'];
+
+    if (userName) {
+      this.loginForm.patchValue({ userName });
+    }
+    if (password) {
+      this.loginForm.patchValue({ password });
+    }
+
+    this.status=status;
+    if(userName && password)
+       this.login();
+  });
   }
 
   login(): void {
@@ -62,7 +80,22 @@ export class Login implements OnInit {
             //this.sidebar.updateMenuItems(res.userInfo);
             this.authService.startAutoLogoutWatcher();
             this.loadingService.hide();
-            this.router.navigate(['/dashboard']);
+       
+              switch(this.status){
+                case 'CheckPending':
+                  this.router.navigate(['/accounting/voucher-approval'], { queryParams: { status: 'CheckPending' } });
+                  break;
+                case 'ReferralPending':
+                  this.router.navigate(['/accounting/voucher-approval'], { queryParams: { status: 'ReferralPending' } });
+                  break;
+                case 'ApprovalPending':
+                  this.router.navigate(['/accounting/voucher-approval'], { queryParams: { status: 'ApprovalPending' } });
+                  break; 
+                default:
+                  this.router.navigate(['/dashboard']);
+                  break; 
+              }
+              
             this.msgSvc.showSuccessMsg('Loggedin Successfully.');
           }
         },
@@ -72,6 +105,6 @@ export class Login implements OnInit {
           console.error('Login failed', err);
         }
       });
-    }, 500);
+    }, 0);
   }
 }

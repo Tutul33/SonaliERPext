@@ -17,19 +17,25 @@ export class BreadcrumbService {
     // Place the subscriptions here
     this.sidebarService.menuItemsSubject.subscribe(menu => {
       const currentUrl = this.router.url;
+      debugger;
       this.breadcrumbs = this.buildBreadcrumbs(currentUrl);
     });
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
+      debugger;
       this.breadcrumbs = this.buildBreadcrumbs(this.router.url);
     });
   }
 
   private buildBreadcrumbs(currentUrl: string): Breadcrumb[] {
-    const breadcrumbs: Breadcrumb[] = [];
     const menu = this.sidebarService.menuItemsSubject.value;
+    debugger;
+    
+    const [path, queryString] = currentUrl.split("?");
+    const params = new URLSearchParams(queryString);
+    const status = params.get("status");
 
     const findCrumb = (items: any[], url: string, trail: Breadcrumb[] = []): Breadcrumb[] | null => {
       for (const item of items) {
@@ -45,9 +51,10 @@ export class BreadcrumbService {
         }
 
         // Check query params if needed
-        if (item.queryParam && currentUrl.includes(item.route)) {
+        if (item.queryParam && item.queryParam.status==status && path==item.route) {
           return newTrail;
         }
+        
       }
       return null;
     };

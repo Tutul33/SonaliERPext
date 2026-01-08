@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { Confirmation, ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 
 @Injectable({
@@ -19,7 +19,8 @@ export class ConfirmationDialogService {
     acceptLabel?: string,
     rejectLabel?: string,
     onAccept: () => void,
-    onReject?: () => void
+    onReject?: () => void,
+    styleClass?: string;   
   }) {
     this.confirmationService.confirm({
       target: options.event?.currentTarget as EventTarget,
@@ -39,6 +40,6 @@ export class ConfirmationDialogService {
       reject: () => {
         options.onReject?.();
       }
-    });
+    } );
   }
 }

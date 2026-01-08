@@ -4,7 +4,7 @@
       <h3>Voucher Authentication 1</h3><br>
       <h4>
         <span>Role:</span>
-        <span class="text-danger">{{modelSvc.status=='referral-pending'?'Referral':modelSvc.status=='check-pending'?'Voucher Check':'Approval'}}</span>
+        <span class="text-danger">{{modelSvc.status=='ReferralPending'?'Referral':modelSvc.status=='CheckPending'?'Voucher Check':'Approval'}}</span>
       </h4>
       <h4>
         <span>Total:</span><span class="text-danger">{{totalRecords}}</span>
@@ -179,7 +179,7 @@
   <div class="row m-3">
     <div class="col-md-2">
       <b>Date</b><br>
-      <p-datepicker [(ngModel)]="modelSvc.voucherModel.entryDate" placeholder="Date"></p-datepicker>
+      <p-datepicker [(ngModel)]="modelSvc.voucherModel.entryDate" disabled="true" placeholder="Date" dateFormat="dd/MM/yy"></p-datepicker>
     </div>
     <div class="col-md-10">
       <b>Total Debit</b><span>: {{modelSvc.voucherModel.totalDebit}}</span>&nbsp;
@@ -208,7 +208,7 @@
     </div>
   </div>
   <div class="row m-3">
-    @if(modelSvc.status=='referral-pending'){
+    @if(modelSvc.status=='ReferralPending'){
     <div class="col-md-12 mb-3">
       <p-button label="Add" (onClick)="addNewVoucherItem()" styleClass="float-end p-button-sm"><i
           class="bi bi-plus"></i></p-button>
@@ -241,7 +241,7 @@
 
             </div>
           </th>
-          @if(modelSvc.status=='referral-pending'){
+          @if(modelSvc.status=='ReferralPending'){
           <th style="width:5%">
             <div class="flex items-center gap-2">
               Edit
@@ -251,7 +251,7 @@
       </ng-template>
       <ng-template #body let-voucherItem>
         @if(voucherItem.tag!=2) {
-        @if(modelSvc.status=='referral-pending')
+        @if(modelSvc.status=='ReferralPending')
         {
         <tr>
           <td>
@@ -339,15 +339,15 @@
     <div class="col-md-12 ">
 
       <p-button
-        [label]="modelSvc.status=='referral-pending'?'Update':modelSvc.status=='check-pending'?'Check':'Approve'"
+        [label]="modelSvc.status=='ReferralPending'?'Update':modelSvc.status=='CheckPending'?'Check':'Approve'"
         severity="success" styleClass="p-button-sm" (onClick)="confirmUpdateVoucher($event)">
         <i
-          [ngClass]="{'bi bi-check-circle': modelSvc.status !== 'check-pending','bi bi-check': modelSvc.status === 'check-pending' }"></i>
+          [ngClass]="{'bi bi-check-circle': modelSvc.status !== 'CheckPending','bi bi-check': modelSvc.status === 'CheckPending' }"></i>
       </p-button>
 
       <p-button label="Cancel" severity="warn" styleClass="ms-3 p-button-sm" (onClick)="showDetailsToggle(null)"><i
           class="bi bi-x-circle"></i></p-button>
-      @if(modelSvc.status !== 'referral-pending'){
+      @if(modelSvc.status !== 'ReferralPending'){
       <p-button label="Refer" severity="help" styleClass="ms-3 p-button-sm" (onClick)="showDialogReferral()"><i
           class="bi bi-box-arrow-up-right"></i></p-button>
       }

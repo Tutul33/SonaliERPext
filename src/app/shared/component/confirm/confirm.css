@@ -1,0 +1,16 @@
+.p-confirmpopup.left-up {
+  --p-confirmpopup-arrow-left: 16px;
+  --p-confirmpopup-arrow-top: 10px;
+}
+.p-confirmpopup.left-down {
+  --p-confirmpopup-arrow-left: 16px;
+  --p-confirmpopup-arrow-bottom: 10px;
+}
+.p-confirmpopup.right-up {
+  --p-confirmpopup-arrow-right: 16px;
+  --p-confirmpopup-arrow-top: 10px;
+}
+.p-confirmpopup.right-down {
+  --p-confirmpopup-arrow-right: 16px;
+  --p-confirmpopup-arrow-bottom: 10px;
+}
